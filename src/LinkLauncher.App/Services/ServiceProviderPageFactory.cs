@@ -1,5 +1,6 @@
 namespace LinkLauncher.App.Services;
 
+using LinkLauncher.Features.Activity;
 using LinkLauncher.Features.Dashboard;
 using LinkLauncher.Features.Library;
 using LinkLauncher.Features.Navigation;
@@ -22,6 +23,7 @@ public sealed class ServiceProviderPageFactory : INavigationPageFactory
     {
         NavigationRoutes.Dashboard => _serviceProvider.GetRequiredService<DashboardViewModel>(),
         NavigationRoutes.Library => _serviceProvider.GetRequiredService<LibraryViewModel>(),
+        NavigationRoutes.Activity => _serviceProvider.GetRequiredService<ActivityViewModel>(),
         NavigationRoutes.Settings => _serviceProvider.GetRequiredService<SettingsViewModel>(),
         _ => throw new ArgumentOutOfRangeException(nameof(route), route, "Route de navigation inconnue.")
     };

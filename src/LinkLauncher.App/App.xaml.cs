@@ -5,6 +5,7 @@ using System.Net.Http;
 using LinkLauncher.App.Services;
 using LinkLauncher.Core.Abstractions;
 using LinkLauncher.Core.Services;
+using LinkLauncher.Features.Activity;
 using LinkLauncher.Features.Dashboard;
 using LinkLauncher.Features.Discord;
 using LinkLauncher.Features.Library;
@@ -13,6 +14,7 @@ using LinkLauncher.Features.Navigation;
 using LinkLauncher.Features.Settings;
 using LinkLauncher.Features.Shell;
 using LinkLauncher.Features.Updates;
+using LinkLauncher.Infrastructure.Activity;
 using LinkLauncher.Infrastructure.Diagnostics;
 using LinkLauncher.Infrastructure.Discord;
 using LinkLauncher.Infrastructure.FileSystem;
@@ -54,8 +56,11 @@ public partial class App : Application
             var library = _serviceProvider.GetRequiredService<ILauncherLibrary>();
             await library.InitializeAsync();
 
+            await _serviceProvider.GetRequiredService<IActivityHistory>().InitializeAsync();
+
             _serviceProvider.GetRequiredService<RobloxActivityNotifier>().Start();
             _serviceProvider.GetRequiredService<DiscordPresenceCoordinator>().Start();
+            _serviceProvider.GetRequiredService<ActivityRecorder>().Start();
 
             var themeService = _serviceProvider.GetRequiredService<IThemeService>();
             var systemThemeSource = _serviceProvider.GetRequiredService<ISystemThemeSource>();
@@ -134,6 +139,11 @@ public partial class App : Application
         services.AddSingleton<IUpdateChecker, UpdateChecker>();
         services.AddSingleton<IUpdateDownloader, UpdateDownloader>();
 
+        services.AddSingleton<IActivityHistoryStore, JsonActivityHistoryStore>();
+        services.AddSingleton<ActivityHistoryService>();
+        services.AddSingleton<IActivityHistory>(provider => provider.GetRequiredService<ActivityHistoryService>());
+        services.AddSingleton<ActivityRecorder>();
+
         services.AddSingleton<ILibraryStore, JsonLibraryStore>();
         services.AddSingleton<LauncherLibraryService>();
         services.AddSingleton<ILauncherLibrary>(provider => provider.GetRequiredService<LauncherLibraryService>());
@@ -141,6 +151,7 @@ public partial class App : Application
 
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<LibraryViewModel>();
+        services.AddTransient<ActivityViewModel>();
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<UpdateViewModel>();
 

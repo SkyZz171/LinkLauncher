@@ -13,7 +13,7 @@ Fonctionnalités réellement opérationnelles dans cette version :
 | Fonctionnalité | État |
 | --- | --- |
 | Fenêtre principale avec chrome personnalisé (réduire / agrandir / fermer, déplacement) | Opérationnel |
-| Navigation latérale (Dashboard, Bibliothèque, Paramètres) avec conservation de l'état des pages | Opérationnel |
+| Navigation latérale (Dashboard, Bibliothèque, Activité, Paramètres) avec conservation de l'état des pages | Opérationnel |
 | Dashboard : détection réelle de l'installation Roblox, version du client, dossier de version | Opérationnel |
 | Dashboard : « Ouvrir le dossier Roblox » dans l'explorateur | Opérationnel |
 | Dashboard : vérification des fichiers indispensables au lancement (intégrité) | Opérationnel |
@@ -27,6 +27,7 @@ Fonctionnalités réellement opérationnelles dans cette version :
 | Journalisation fichier quotidienne | Opérationnel |
 | Bibliothèque d'expériences : ajout par lien officiel ou identifiant de lieu, retrait, date de dernière ouverture | Opérationnel |
 | Profils de lancement : nom et langue transmise au client, profil actif appliqué à « Jouer » | Opérationnel |
+| Activité : sessions observées, temps de jeu du jour, sur 7 jours et depuis le début | Opérationnel |
 | Notifications locales au démarrage et à la fermeture du client Roblox (y compris lancé depuis le navigateur) | Opérationnel, désactivables |
 | Présence Discord (activité LinkLauncher et client Roblox) via le client Discord local | Opérationnel une fois un identifiant d'application fourni |
 | Rapport de diagnostic (Windows, .NET, chemins, Roblox, intégrité, dernier journal) et copie dans le presse-papiers | Opérationnel |
@@ -151,6 +152,7 @@ tools/
 | Sauvegarde de la configuration | `%APPDATA%\LinkLauncher\settings.bak.json` |
 | Configuration illisible conservée | `%APPDATA%\LinkLauncher\settings.invalide-<horodatage>.json` |
 | Bibliothèque (profils et expériences) | `%APPDATA%\LinkLauncher\library.json` |
+| Historique des sessions Roblox | `%APPDATA%\LinkLauncher\activity.json` |
 | Bibliothèque illisible conservée | `%APPDATA%\LinkLauncher\library.invalide-<horodatage>.json` |
 | Paquets de mise à jour vérifiés | `%LOCALAPPDATA%\LinkLauncher\updates\<version>\` |
 | Journaux d'activité | `%LOCALAPPDATA%\LinkLauncher\logs\linklauncher-AAAAMMJJ.log` |
@@ -164,3 +166,5 @@ ces dossiers : vos préférences et votre bibliothèque survivent à une désins
 - [Tests manuels](docs/MANUAL-TESTS.md) — scénarios de validation des phases 1 à 6.
 - [Publier une release](docs/RELEASE.md) — paquet à joindre, notes avec empreinte SHA-256, contrôle
   depuis la carte « Mises à jour ».
+- [Parité avec Bloxstrap](docs/BLOXSTRAP-PARITY.md) — fonctionnalités reprises, et refus assumés
+  (FastFlags, multi-instance, mods, injection).

@@ -31,7 +31,8 @@ public sealed partial class ShellViewModel : ObservableObject
         [
             new NavigationItem(NavigationRoutes.Dashboard, "Dashboard", "\uE80F", "Ctrl+1"),
             new NavigationItem(NavigationRoutes.Library, "Bibliothèque", "\uE8F1", "Ctrl+2"),
-            new NavigationItem(NavigationRoutes.Settings, "Paramètres", "\uE713", "Ctrl+3")
+            new NavigationItem(NavigationRoutes.Activity, "Activité", "\uE81C", "Ctrl+3"),
+            new NavigationItem(NavigationRoutes.Settings, "Paramètres", "\uE713", "Ctrl+4")
         ];
 
         _navigation.Navigated += OnNavigated;

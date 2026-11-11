@@ -26,7 +26,8 @@
     <Window.InputBindings>
         <KeyBinding Key="D1" Modifiers="Ctrl" Command="{Binding NavigateToRouteCommand}" CommandParameter="dashboard" />
         <KeyBinding Key="D2" Modifiers="Ctrl" Command="{Binding NavigateToRouteCommand}" CommandParameter="library" />
-        <KeyBinding Key="D3" Modifiers="Ctrl" Command="{Binding NavigateToRouteCommand}" CommandParameter="settings" />
+        <KeyBinding Key="D3" Modifiers="Ctrl" Command="{Binding NavigateToRouteCommand}" CommandParameter="activity" />
+        <KeyBinding Key="D4" Modifiers="Ctrl" Command="{Binding NavigateToRouteCommand}" CommandParameter="settings" />
     </Window.InputBindings>
 
     <Window.Resources>

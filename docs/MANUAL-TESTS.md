@@ -143,6 +143,23 @@ Scénarios à valider sur une machine Windows. Cocher après exécution réelle.
 - [ ] Réinstallation par-dessus une version antérieure : les données utilisateur restent intactes.
 - [ ] Désinstallation : l'application et ses raccourcis disparaissent, `%APPDATA%\LinkLauncher` est conservé.
 
+## Activité (reprise de Bloxstrap)
+
+- [ ] Navigation : l'entrée « Activité » (Ctrl+3) ouvre la page et la marque active ; Paramètres
+      passe à Ctrl+4.
+- [ ] Premier passage : les trois totaux affichent « 0 min » et l'état vide explique le
+      fonctionnement.
+- [ ] Lancement du client Roblox : une session apparaît, sans durée tant que le client tourne.
+- [ ] Fermeture du client : la session est close, sa durée s'affiche et le code de sortie est
+      mentionné.
+- [ ] Les totaux « Aujourd'hui » et « 7 derniers jours » correspondent aux sessions observées.
+- [ ] Fermeture de LinkLauncher pendant que le client tourne, puis redémarrage : la session
+      apparaît comme « interrompue » et sa durée n'est pas comptée.
+- [ ] « Effacer » demande une seconde confirmation, puis vide la page et `activity.json`.
+- [ ] `activity.json` supprimé ou corrompu à la main : la page reste vide, sans erreur, et un
+      fichier `activity.invalide-<horodatage>.json` est conservé.
+- [ ] Aucun contenu de jeu, aucun nom de serveur et aucune donnée de compte dans `activity.json`.
+
 ## Robustesse
 
 - [ ] `settings.json` corrompu à la main : l'application démarre, un fichier

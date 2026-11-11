@@ -29,7 +29,7 @@ Aucune dépendance technique. Contient :
   `LauncherLibrary` (versionnée par `SchemaVersion`), `LibraryMutation`, `AppNotification`
   (issue `NotificationKind`), `DiscordActivity`, `DiscordPresenceState`, `DiagnosticsReport`,
   `AppVersion`, `UpdateRelease`, `UpdateCheckResult` (issue `UpdateCheckOutcome`),
-  `UpdateDownloadResult`.
+  `UpdateDownloadResult`, `PlaySession`, `ActivityHistory`, `ActivitySummary`.
 - **Règles** : `ThemeResolver` (thème effectif), `RobloxVersionParser` (versions Windows
   `0, 747, 0, 7471481`), `RobloxBuildSelector` (dossier le plus récent), `AppSettingsNormalizer`
   (valeurs par défaut, schéma, énumérations inconnues), `RobloxLaunchUriBuilder` (URI officielle
@@ -40,7 +40,9 @@ Aucune dépendance technique. Contient :
   `AppNotificationRules` (transition → notification), `DiscordActivityRules` (activité et
   troncature à 128 caractères), `DiscordApplicationIdRules` (identifiant public à 17–20 chiffres),
   `DiscordIpcMessages` (trames binaires du canal IPC Discord), `UpdateRules` (sélection de la
-  publication la plus récente, extraction et validation d'une empreinte SHA-256).
+  publication la plus récente, extraction et validation d'une empreinte SHA-256),
+  `ActivityHistoryRules` (ouverture et clôture de session, totaux du jour et sur sept jours,
+  formatage des durées, sessions interrompues jamais comptées).
 - **Abstractions** : `ISettingsService`, `ISettingsStore`, `IRobloxProbe`, `IThemeService`,
   `ISystemThemeSource`, `IProtocolRegistrationReader`, `IExecutableVersionReader`,
   `IFolderLauncher`, `IFileSystem`, `IAppPaths`, `IAppLogger`, `IApplicationVersionProvider`,
@@ -48,7 +50,7 @@ Aucune dépendance technique. Contient :
   `IRobloxProcessMonitor`, `ILibraryStore`, `ILauncherLibrary`, `IActiveProfileProvider`,
   `INotificationPresenter`, `IDiscordIpcTransport`, `IDiscordPresenceService`,
   `IDiagnosticsProvider`, `IClipboardService`, `IUpdateFeed`, `IUpdateChecker`,
-  `IUpdateDownloader`.
+  `IUpdateDownloader`, `IActivityHistory`, `IActivityHistoryStore`.
 
 ### Infrastructure
 
@@ -89,6 +91,10 @@ Implémentations techniques :
   avec une seule ligne de journal.
 - `WindowsDiagnosticsProvider` : agrège version de l'application, Windows, moteur .NET,
   architecture, chemins, détection Roblox, intégrité et dernier journal. Lecture seule.
+- `JsonActivityHistoryStore` : conserve `activity.json` de façon atomique, fichier illisible
+  préservé puis historique vide, accès sérialisé.
+- `ActivityHistoryService` : état courant de l'historique, ouverture et clôture de session sur
+  les transitions du moniteur, publication de `Changed` après chaque écriture réussie.
 - `WindowsThemeSource`, `RegistryProtocolReader`, `WindowsExecutableVersionReader`,
   `ExplorerFolderLauncher`, `WindowsAppPaths`, `SystemFileSystem`.
 
@@ -116,6 +122,10 @@ Implémentations techniques :
   construit l'activité par `DiscordActivityRules` et la publie via `IDiscordPresenceService`.
 - `UpdateViewModel` : recherche, téléchargement vérifié puis lancement de l'installeur par
   `IShellLauncher` ; aucune écriture dans les fichiers de l'application.
+- `ActivityRecorder` : abonné au moniteur, il ouvre et clôt une session par lancement observé ;
+  un client déjà en cours d'exécution au démarrage produit une session datée de son heure réelle.
+- `ActivityViewModel` : totaux du jour, des sept derniers jours et depuis le début, sessions
+  récentes, effacement confirmé par un second clic ; événements ramenés sur le thread d'interface.
 
 ### App
 
@@ -145,9 +155,11 @@ Implémentations techniques :
 4. Application du thème (`ThemeResolver` + `IThemeService`).
 5. `ILauncherLibrary.InitializeAsync()` : lecture de `library.json`, normalisation, profil actif disponible
    pour le service de lancement.
-6. Démarrage de `RobloxActivityNotifier` et de `DiscordPresenceCoordinator` : ils s'abonnent au
-   moniteur et n'agissent que selon les préférences enregistrées.
-7. Affichage de `MainWindow` puis `ShellViewModel.StartAsync()` → Dashboard : démarrage du
+6. `IActivityHistory.InitializeAsync()` : lecture de `activity.json`, sessions laissées ouvertes
+   marquées comme interrompues, aucune durée inventée.
+7. Démarrage de `RobloxActivityNotifier`, de `DiscordPresenceCoordinator` et d'`ActivityRecorder` :
+   ils s'abonnent au moniteur et n'agissent que selon les préférences enregistrées.
+8. Affichage de `MainWindow` puis `ShellViewModel.StartAsync()` → Dashboard : démarrage du
    moniteur de processus, détection de l'installation, vérification de l'intégrité.
 
 ## Décisions techniques
@@ -190,6 +202,10 @@ Implémentations techniques :
   empreinte SHA-256 publiée, recalculée après téléchargement ; un écart supprime le fichier et
   une publication sans empreinte est refusée. LinkLauncher lance l'installeur, il ne remplace
   jamais ses propres fichiers, et l'absence de signature Authenticode reste documentée.
+- **Activité sans inference** : une session n'est comptée que si sa fermeture a été observée.
+  Une session laissée ouverte par un arrêt brutal est marquée interrompue et sa durée reste nulle
+  plutôt que d'être estimée ; LinkLauncher ne prétend pas savoir quelle expérience a été rejointe,
+  la jointure se faisant dans le navigateur.
 - **Journal non verrouillé** : écriture ouverte/fermée par entrée, pour rester consultable.
 - **Thème « Système »** : résolu au démarrage ; le suivi en direct des changements Windows
   pourra être ajouté avec un abonnement aux paramètres système.

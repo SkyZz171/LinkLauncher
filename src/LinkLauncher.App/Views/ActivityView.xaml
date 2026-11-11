@@ -1,0 +1,190 @@
+<UserControl x:Class="LinkLauncher.App.Views.ActivityView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Transparent"
+             Focusable="False">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  Focusable="False">
+        <StackPanel Margin="{StaticResource Padding.Page}" MaxWidth="1180" HorizontalAlignment="Stretch">
+
+            <!-- En-tête -->
+            <Grid Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Text.PageTitle}" Text="Activité" />
+                    <TextBlock Margin="0,4,0,0"
+                               Style="{StaticResource Text.Body.Secondary}"
+                               Text="Temps d'utilisation réellement observé du client Roblox, enregistré sur ce PC." />
+                </StackPanel>
+
+                <Button Grid.Column="1"
+                        VerticalAlignment="Top"
+                        AutomationProperties.Name="Actualiser l'activité"
+                        Command="{Binding RefreshCommand}"
+                        Style="{StaticResource Button.Secondary}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="12" Style="{StaticResource Text.Icon}" Text="&#xE72C;" />
+                        <TextBlock Margin="8,0,0,0" Text="Actualiser" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+
+            <!-- Erreur -->
+            <Border Margin="0,0,0,14"
+                    Padding="14,10"
+                    Background="{DynamicResource Brush.Danger.Subtle}"
+                    BorderBrush="{DynamicResource Brush.Danger}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Radius.Control}"
+                    Visibility="{Binding ErrorMessage, Converter={StaticResource NullToVisibility}}">
+                <TextBlock Foreground="{DynamicResource Brush.Text.Primary}"
+                           Style="{StaticResource Text.Body.Secondary}"
+                           Text="{Binding ErrorMessage}" />
+            </Border>
+
+            <!-- Message -->
+            <Border Margin="0,0,0,14"
+                    Padding="14,10"
+                    Background="{DynamicResource Brush.Accent.Subtle}"
+                    BorderBrush="{DynamicResource Brush.Accent.Border}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Radius.Control}"
+                    Visibility="{Binding StatusMessage, Converter={StaticResource NullToVisibility}}">
+                <TextBlock Foreground="{DynamicResource Brush.Text.Primary}"
+                           Style="{StaticResource Text.Body.Secondary}"
+                           Text="{Binding StatusMessage}" />
+            </Border>
+
+            <!-- Totaux -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Style="{StaticResource Card.Inset}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource Text.Caption}" Text="Aujourd'hui" />
+                        <TextBlock Margin="0,6,0,0" Style="{StaticResource Text.Value}" Text="{Binding TodayText}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Margin="12,0,0,0" Style="{StaticResource Card.Inset}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource Text.Caption}" Text="7 derniers jours" />
+                        <TextBlock Margin="0,6,0,0" Style="{StaticResource Text.Value}" Text="{Binding WeekText}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Margin="12,0,0,0" Style="{StaticResource Card.Inset}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource Text.Caption}" Text="Depuis le début" />
+                        <TextBlock Margin="0,6,0,0" Style="{StaticResource Text.Value}" Text="{Binding TotalText}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Sessions -->
+            <Border Margin="0,14,0,0" Style="{StaticResource Card}">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource Text.Section}" Text="Sessions récentes" />
+                            <TextBlock Margin="0,4,0,0"
+                                       Style="{StaticResource Text.Caption}"
+                                       Text="{Binding SessionCountText}" />
+                        </StackPanel>
+
+                        <Button Grid.Column="1"
+                                VerticalAlignment="Top"
+                                AutomationProperties.Name="Effacer l'historique"
+                                Command="{Binding ClearHistoryCommand}"
+                                Content="Effacer"
+                                Style="{StaticResource Button.Subtle}" />
+                    </Grid>
+
+                    <TextBlock Margin="0,6,0,0" Style="{StaticResource Text.Caption}" Text="{Binding LastSessionText}" />
+
+                    <!-- État vide -->
+                    <Border Margin="0,14,0,0"
+                            Padding="20,22"
+                            Background="{DynamicResource Brush.Surface.Alt}"
+                            BorderBrush="{DynamicResource Brush.Stroke}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Radius.Control}"
+                            Visibility="{Binding IsEmpty, Converter={StaticResource BooleanToVisibility}}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource Text.Strong}" Text="Aucune session enregistrée pour l'instant" />
+                            <TextBlock Margin="0,6,0,0"
+                                       Style="{StaticResource Text.Body.Secondary}"
+                                       Text="Lancez le client Roblox : LinkLauncher enregistrera le début et la fin de la session, y compris lorsque le client est démarré depuis votre navigateur." />
+                        </StackPanel>
+                    </Border>
+
+                    <ItemsControl Margin="0,10,0,0" ItemsSource="{Binding Sessions}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="0,0,0,6"
+                                        Padding="14,10"
+                                        Background="{DynamicResource Brush.Surface.Alt}"
+                                        BorderBrush="{DynamicResource Brush.Stroke}"
+                                        BorderThickness="1"
+                                        CornerRadius="{StaticResource Radius.Control}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="190" />
+                                            <ColumnDefinition Width="180" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock VerticalAlignment="Center"
+                                                   Style="{StaticResource Text.Body.Secondary}"
+                                                   Text="{Binding When}" />
+                                        <TextBlock Grid.Column="1"
+                                                   VerticalAlignment="Center"
+                                                   Style="{StaticResource Text.Strong}"
+                                                   Text="{Binding Duration}"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Grid.Column="2"
+                                                   Margin="12,0,0,0"
+                                                   VerticalAlignment="Center"
+                                                   Style="{StaticResource Text.Caption}"
+                                                   Text="{Binding Detail}"
+                                                   TextTrimming="CharacterEllipsis" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Margin="0,10,0,0"
+                               Style="{StaticResource Text.Caption}"
+                               Text="Une session est close lorsque la fermeture du processus est observée. Si LinkLauncher s'arrête avant, la session est marquée interrompue et sa durée n'est pas comptée : aucune durée n'est déduite d'une heure de fin supposée." />
+                </StackPanel>
+            </Border>
+
+            <!-- Données -->
+            <Border Margin="0,14,0,0" Style="{StaticResource Card.Inset}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Text.Strong}" Text="Données locales" />
+                    <TextBlock Margin="0,4,0,0"
+                               Style="{StaticResource Text.Body.Secondary}"
+                               Text="Historique conservé dans %APPDATA%\LinkLauncher\activity.json, limité aux 200 dernières sessions. Aucun contenu de jeu, aucune conversation et aucune donnée de compte n'y figure, et rien n'est envoyé sur Internet." />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>
