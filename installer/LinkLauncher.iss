@@ -3,7 +3,10 @@
 ; Le paquet publié doit se trouver dans artifacts\publish (voir build.ps1).
 
 #define AppName "LinkLauncher"
-#define AppVersion "0.1.0"
+; build.ps1 transmet la version avec /DAppVersion=<version> ; cette valeur ne sert que par defaut.
+#ifndef AppVersion
+  #define AppVersion "0.1.0"
+#endif
 #define AppPublisher "LinkLauncher"
 #define AppExeName "LinkLauncher.exe"
 

@@ -162,3 +162,5 @@ ces dossiers : vos préférences et votre bibliothèque survivent à une désins
 
 - [Architecture](docs/ARCHITECTURE.md) — couches, dépendances, décisions techniques.
 - [Tests manuels](docs/MANUAL-TESTS.md) — scénarios de validation des phases 1 à 6.
+- [Publier une release](docs/RELEASE.md) — paquet à joindre, notes avec empreinte SHA-256, contrôle
+  depuis la carte « Mises à jour ».
