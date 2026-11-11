@@ -6,14 +6,14 @@ LinkLauncher utilise **le client Roblox officiel** : il ne modifie aucun binaire
 ne lit aucun identifiant Roblox et ne contourne aucun mécanisme de sécurité ou d'anti-triche.
 Le projet n'est pas affilié à Roblox Corporation.
 
-## État actuel — Phase 3 (bibliothèque d'expériences et profils de lancement)
+## État actuel — Phase 6 (notifications, Discord, diagnostic, mises à jour et installeur)
 
 Fonctionnalités réellement opérationnelles dans cette version :
 
 | Fonctionnalité | État |
 | --- | --- |
 | Fenêtre principale avec chrome personnalisé (réduire / agrandir / fermer, déplacement) | Opérationnel |
-| Navigation latérale (Dashboard, Paramètres) avec conservation de l'état des pages | Opérationnel |
+| Navigation latérale (Dashboard, Bibliothèque, Paramètres) avec conservation de l'état des pages | Opérationnel |
 | Dashboard : détection réelle de l'installation Roblox, version du client, dossier de version | Opérationnel |
 | Dashboard : « Ouvrir le dossier Roblox » dans l'explorateur | Opérationnel |
 | Dashboard : vérification des fichiers indispensables au lancement (intégrité) | Opérationnel |
@@ -27,8 +27,14 @@ Fonctionnalités réellement opérationnelles dans cette version :
 | Journalisation fichier quotidienne | Opérationnel |
 | Bibliothèque d'expériences : ajout par lien officiel ou identifiant de lieu, retrait, date de dernière ouverture | Opérationnel |
 | Profils de lancement : nom et langue transmise au client, profil actif appliqué à « Jouer » | Opérationnel |
+| Notifications locales au démarrage et à la fermeture du client Roblox (y compris lancé depuis le navigateur) | Opérationnel, désactivables |
+| Présence Discord (activité LinkLauncher et client Roblox) via le client Discord local | Opérationnel une fois un identifiant d'application fourni |
+| Rapport de diagnostic (Windows, .NET, chemins, Roblox, intégrité, dernier journal) et copie dans le presse-papiers | Opérationnel |
+| Recherche de mise à jour sur les publications GitHub, vérification SHA-256, téléchargement et lancement de l'installeur | Opérationnel |
+| Installeur Windows (Inno Setup) avec raccourcis et désinstallation | Opérationnel |
 | Rejoindre une expérience depuis LinkLauncher | **Non implémenté** — le navigateur s'en charge |
-| Installation / réparation automatisée, Discord RPC, notifications, mises à jour, installateur | Non implémenté — phases suivantes |
+| Installation ou réparation automatisée du client Roblox | **Non implémenté** — redirige vers le site officiel |
+| Signature de code de l'installeur | Non fournie — l'empreinte SHA-256 publiée est vérifiée à la place |
 
 ### Comment le lancement fonctionne
 
@@ -57,11 +63,39 @@ est transmis au client comme paramètre `robloxLocale`/`gameLocale` lors du lanc
 aucun identifiant, aucun cookie et aucun jeton ne sont enregistrés, ni dans la bibliothèque ni
 ailleurs.
 
+### Notifications, présence Discord et diagnostic
+
+Les notifications sont des fenêtres WPF maison, sans dépendance tierce : elles signalent le
+démarrage et la fermeture du client Roblox observés par le moniteur de processus, donc aussi
+lorsque le client a été lancé depuis un navigateur. Elles sont activées par défaut et se coupent
+depuis les Paramètres.
+
+La présence Discord utilise le canal IPC local du client Discord (`discord-ipc-0` à `-9`), sans
+bibliothèque et sans accès réseau. Elle reste **inactive** tant qu'aucun identifiant
+d'application Discord (17 à 20 chiffres) n'est enregistré : cet identifiant est public, se crée
+sur `discord.com/developers/applications`, et aucun jeton, secret ou donnée de compte Roblox
+n'est demandé ni stocké. Si Discord n'est pas démarré, la présence est simplement indisponible et
+le journal le mentionne une fois.
+
+Le rapport de diagnostic rassemble la version de LinkLauncher, Windows, le moteur .NET,
+l'architecture, les chemins des données et des journaux, la version et le dossier du client
+Roblox, le verdict d'intégrité et le dernier journal. Il ne contient aucun identifiant et peut
+être copié dans le presse-papiers pour un rapport de bogue.
+
+### Mises à jour
+
+LinkLauncher interroge les publications de `github.com/SkyZz171/LinkLauncher`. Une publication
+n'est proposée que si elle contient un installeur `.exe` **et** une empreinte SHA-256 dans ses
+notes ; le paquet est téléchargé dans `%LOCALAPPDATA%\LinkLauncher\updates`, son empreinte est
+recalculée puis comparée, et un fichier différent est supprimé. LinkLauncher ne remplace jamais
+ses propres fichiers : il lance l'installeur vérifié et l'utilisateur garde la main.
+
 ## Prérequis
 
-- Windows 10 ou 11
-- SDK .NET 10 (`dotnet --version` doit répondre `10.0.4xx`)
+- Windows 10 version 1809 ou ultérieure, ou Windows 11
+- SDK .NET 10 (`dotnet --version` doit répondre `10.0.4xx`) pour compiler
 - Client Roblox officiel installé par le site de Roblox
+- Inno Setup 6 uniquement pour fabriquer l'installeur
 
 ## Compiler et tester
 
@@ -72,21 +106,42 @@ dotnet test LinkLauncher.slnx -c Release
 dotnet run --project src/LinkLauncher.App
 ```
 
+## Publier et installer
+
+```powershell
+# Publication autonome (win-x64, fichier unique) dans artifacts\publish
+installer\build.ps1
+
+# Publication puis compilation de l'installeur Inno Setup dans artifacts\installer
+installer\build.ps1 -Installer
+installer\build.ps1 -Version 0.2.0 -Installer
+```
+
+`build.ps1` affiche l'empreinte SHA-256 de l'installeur : reportez-la dans les notes de la
+publication GitHub, c'est elle que LinkLauncher vérifie avant d'installer une mise à jour.
+
+L'icône de l'application est générée par `tools\make-icon.ps1` vers
+`src\LinkLauncher.App\Assets\linklauncher.ico`.
+
 ## Structure
 
 ```
 src/
   LinkLauncher.App/             Interface WPF : composition, fenêtre, vues, design system
   LinkLauncher.Core/            Modèles, abstractions et règles métier (sans dépendance WPF)
-  LinkLauncher.Infrastructure/  JSON, fichiers, registre Windows, journalisation, Roblox
+  LinkLauncher.Infrastructure/  JSON, fichiers, registre Windows, journalisation, Roblox, Discord
   LinkLauncher.Features/        ViewModels, navigation, logique de présentation
+  LinkLauncher.Updater/         Publications GitHub, vérification SHA-256, téléchargement
 tests/
-  LinkLauncher.Core.Tests/             Règles métier, normalisation, navigation, lancement, bibliothèque
-  LinkLauncher.Infrastructure.Tests/   Persistance, journalisation, détection, lancement, intégrité
+  LinkLauncher.Core.Tests/             Règles métier, normalisation, versions, trames IPC
+  LinkLauncher.Infrastructure.Tests/   Persistance, journalisation, détection, lancement, diagnostic
+  LinkLauncher.Integration.Tests/      Cycle complet des préférences et de la mise à jour
+installer/
+  LinkLauncher.iss              Script Inno Setup
+  build.ps1                     Publication et compilation de l'installeur
+tools/
+  make-icon.ps1                 Génération de l'icône
 ```
-
-`LinkLauncher.Updater` (phase 5) et `LinkLauncher.Integration.Tests` (phase 6) seront ajoutés
-lorsqu'ils contiendront du code réel : aucun projet vide n'est conservé dans la solution.
 
 ## Données utilisateur
 
@@ -97,11 +152,13 @@ lorsqu'ils contiendront du code réel : aucun projet vide n'est conservé dans l
 | Configuration illisible conservée | `%APPDATA%\LinkLauncher\settings.invalide-<horodatage>.json` |
 | Bibliothèque (profils et expériences) | `%APPDATA%\LinkLauncher\library.json` |
 | Bibliothèque illisible conservée | `%APPDATA%\LinkLauncher\library.invalide-<horodatage>.json` |
+| Paquets de mise à jour vérifiés | `%LOCALAPPDATA%\LinkLauncher\updates\<version>\` |
 | Journaux d'activité | `%LOCALAPPDATA%\LinkLauncher\logs\linklauncher-AAAAMMJJ.log` |
 
-Aucun cookie, jeton ou identifiant Roblox n'est lu ni stocké.
+Aucun cookie, jeton ou identifiant Roblox n'est lu ni stocké. Le désinstalleur ne supprime pas
+ces dossiers : vos préférences et votre bibliothèque survivent à une désinstallation.
 
 ## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md) — couches, dépendances, décisions techniques.
-- [Tests manuels](docs/MANUAL-TESTS.md) — scénarios de validation des phases 1 à 3.
+- [Tests manuels](docs/MANUAL-TESTS.md) — scénarios de validation des phases 1 à 6.

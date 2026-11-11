@@ -1,4 +1,4 @@
-# Tests manuels — Phases 1 à 3
+# Tests manuels — Phases 1 à 6
 
 Scénarios à valider sur une machine Windows. Cocher après exécution réelle.
 
@@ -84,6 +84,64 @@ Scénarios à valider sur une machine Windows. Cocher après exécution réelle.
 - [ ] Suppression du profil actif : le premier profil restant devient actif.
 - [ ] Tentative de suppression du dernier profil : refusée.
 - [ ] Redémarrage de LinkLauncher : profils, profil actif et expériences sont restaurés depuis `library.json`.
+
+## Notifications (phase 4)
+
+- [ ] Paramètres : la carte « Notifications » est cochée par défaut, la décocher est enregistrée
+      dans `settings.json` (`enableNotifications: false`).
+- [ ] Notifications activées, client arrêté : « Jouer » affiche une notification « Client Roblox
+      lancé » avec le PID, dans le coin de la zone de travail.
+- [ ] Fermeture du client : notification « Client Roblox arrêté » avec le code de sortie.
+- [ ] Lancement du client depuis le site Roblox (navigateur) : la notification apparaît aussi.
+- [ ] Notifications désactivées : aucun affichage, aucune erreur, le journal reste silencieux.
+- [ ] Plusieurs démarrages/arrêts rapides : les fenêtres ne s'empilent pas indéfiniment et se ferment seules.
+
+## Présence Discord (phase 4)
+
+- [ ] Sans identifiant d'application : la présence est désactivée, cocher la case l'active sans
+      publier d'activité, et le texte d'état indique qu'un identifiant est requis.
+- [ ] Identifiant invalide (`abc`, 5 chiffres) : « Enregistrer » affiche « L'identifiant
+      d'application Discord doit contenir 17 à 20 chiffres. », rien n'est enregistré.
+- [ ] Identifiant valide enregistré : la présence est enregistrée dans `settings.json`.
+- [ ] Discord fermé : état « Discord n'est pas joignable… », une seule ligne d'avertissement dans le journal.
+- [ ] Discord ouvert : état « Activité publiée sur Discord. », l'activité « Dans LinkLauncher »
+      apparaît sur le profil, puis « Client Roblox lancé » quand le client tourne.
+- [ ] Décocher la présence : l'activité disparaît du profil Discord.
+- [ ] Aucun jeton ni identifiant Roblox n'apparaît dans `settings.json` ni dans le journal.
+
+## Diagnostic (phase 4)
+
+- [ ] « Collecter » remplit toutes les lignes : LinkLauncher, Windows, moteur .NET, architecture,
+      configuration, bibliothèque, journaux, dernier journal, version et dossier Roblox, client, intégrité.
+- [ ] La date de génération correspond à l'heure réelle et le résumé l'indique.
+- [ ] « Copier le rapport » place un texte lisible dans le presse-papiers.
+- [ ] « Ouvrir les journaux » ouvre `%LOCALAPPDATA%\LinkLauncher\logs`.
+- [ ] Roblox non installé : les lignes Roblox affichent « — » et l'intégrité « Non vérifiée ».
+- [ ] Le rapport ne contient aucun cookie, jeton ou identifiant de compte.
+
+## Mises à jour (phase 5)
+
+- [ ] « Rechercher » sans accès réseau : message « Impossible de joindre le dépôt des publications… »,
+      aucune exception, bouton réactivé.
+- [ ] Dépôt sans publication plus récente : « LinkLauncher 0.1.0 est à jour. ».
+- [ ] Publication plus récente avec installeur et empreinte dans les notes : version affichée,
+      « Télécharger » devient actif.
+- [ ] Publication sans empreinte SHA-256 : le message le dit et « Télécharger » reste inactif.
+- [ ] Téléchargement réussi : le fichier apparaît dans
+      `%LOCALAPPDATA%\LinkLauncher\updates\<version>\` et le statut annonce l'empreinte vérifiée.
+- [ ] Empreinte volontairement fausse dans les notes : le téléchargement est refusé et le fichier
+      est supprimé du disque.
+- [ ] « Installer » lance l'installeur vérifié ; aucun fichier de LinkLauncher n'est modifié par l'application.
+
+## Installeur (phase 6)
+
+- [ ] `installer\build.ps1` produit `artifacts\publish\LinkLauncher.exe` et l'application se lance depuis ce dossier.
+- [ ] `installer\build.ps1 -Installer` produit `artifacts\installer\LinkLauncher-0.1.0-setup.exe`
+      et affiche son empreinte SHA-256.
+- [ ] Installation : l'icône, le raccourci du menu Démarrer et la désinstallation sont présents.
+- [ ] L'application installée démarre, détecte Roblox et conserve les préférences existantes.
+- [ ] Réinstallation par-dessus une version antérieure : les données utilisateur restent intactes.
+- [ ] Désinstallation : l'application et ses raccourcis disparaissent, `%APPDATA%\LinkLauncher` est conservé.
 
 ## Robustesse
 
