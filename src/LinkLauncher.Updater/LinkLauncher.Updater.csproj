@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>LinkLauncher.Updater</RootNamespace>
+    <Description>Recherche, vérification et téléchargement des mises à jour de LinkLauncher.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LinkLauncher.Core\LinkLauncher.Core.csproj" />
+  </ItemGroup>
+
+</Project>

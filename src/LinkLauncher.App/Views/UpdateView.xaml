@@ -1,0 +1,75 @@
+<UserControl x:Class="LinkLauncher.App.Views.UpdateView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Transparent"
+             Focusable="False">
+
+    <Border Style="{StaticResource Card}">
+        <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="16" Foreground="{DynamicResource Brush.Accent}" Style="{StaticResource Text.Icon}" Text="&#xE896;" />
+                <TextBlock Margin="10,0,0,0" Style="{StaticResource Text.Section}" Text="Mises à jour" />
+            </StackPanel>
+
+            <TextBlock Margin="0,8,0,0"
+                       Style="{StaticResource Text.Body.Secondary}"
+                       Text="LinkLauncher vérifie les publications officielles du dépôt GitHub. Un paquet n'est proposé qu'avec son empreinte SHA-256, vérifiée avant toute installation." />
+
+            <Grid Margin="0,14,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Text.Caption}" Text="Version installée" />
+                    <TextBlock Margin="0,4,0,0" Style="{StaticResource Text.Mono}" Text="{Binding CurrentVersion}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                    <TextBlock HorizontalAlignment="Right" Style="{StaticResource Text.Caption}" Text="Dernière publication" />
+                    <TextBlock Margin="0,4,0,0"
+                               HorizontalAlignment="Right"
+                               Style="{StaticResource Text.Strong}"
+                               Text="{Binding AvailableVersionText, TargetNullValue=—}" />
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Margin="0,14,0,0" Orientation="Horizontal">
+                <Button AutomationProperties.Name="Rechercher une mise à jour"
+                        Command="{Binding CheckForUpdatesCommand}"
+                        Content="Rechercher"
+                        Style="{StaticResource Button.Secondary}" />
+                <Button Margin="8,0,0,0"
+                        AutomationProperties.Name="Télécharger la mise à jour"
+                        Command="{Binding DownloadCommand}"
+                        Content="Télécharger"
+                        Style="{StaticResource Button.Secondary}" />
+                <Button Margin="8,0,0,0"
+                        AutomationProperties.Name="Installer la mise à jour"
+                        Command="{Binding InstallCommand}"
+                        Content="Installer"
+                        Style="{StaticResource Button.Primary}" />
+            </StackPanel>
+
+            <TextBlock Margin="0,12,0,0" Style="{StaticResource Text.Body.Secondary}" Text="{Binding StatusText}" />
+
+            <Border Margin="0,10,0,0"
+                    Padding="14,10"
+                    Background="{DynamicResource Brush.Danger.Subtle}"
+                    BorderBrush="{DynamicResource Brush.Danger}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Radius.Control}"
+                    Visibility="{Binding ErrorMessage, Converter={StaticResource NullToVisibility}}">
+                <TextBlock Foreground="{DynamicResource Brush.Text.Primary}"
+                           Style="{StaticResource Text.Body.Secondary}"
+                           Text="{Binding ErrorMessage}" />
+            </Border>
+
+            <TextBlock Margin="0,10,0,0"
+                       Style="{StaticResource Text.Caption}"
+                       Text="Aucune mise à jour n'est appliquée sans votre action : LinkLauncher ne remplace jamais ses fichiers lui-même." />
+        </StackPanel>
+    </Border>
+
+</UserControl>

@@ -9,6 +9,8 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Description>Launcher Roblox indépendant pour Windows.</Description>
     <SatelliteResourceLanguages>fr;en</SatelliteResourceLanguages>
+    <Version>0.1.0</Version>
+    <ApplicationIcon>Assets\linklauncher.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +21,7 @@
     <ProjectReference Include="..\LinkLauncher.Core\LinkLauncher.Core.csproj" />
     <ProjectReference Include="..\LinkLauncher.Infrastructure\LinkLauncher.Infrastructure.csproj" />
     <ProjectReference Include="..\LinkLauncher.Features\LinkLauncher.Features.csproj" />
+    <ProjectReference Include="..\LinkLauncher.Updater\LinkLauncher.Updater.csproj" />
   </ItemGroup>
 
 </Project>

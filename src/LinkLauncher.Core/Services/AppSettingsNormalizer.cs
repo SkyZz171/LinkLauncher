@@ -18,12 +18,16 @@ public static class AppSettingsNormalizer
         }
 
         var defaults = AppSettings.CreateDefault();
+        var discordApplicationId = DiscordApplicationIdRules.Normalize(settings.DiscordApplicationId);
 
         return settings with
         {
             SchemaVersion = AppSettings.CurrentSchemaVersion,
             Theme = Enum.IsDefined(settings.Theme) ? settings.Theme : defaults.Theme,
-            AccentColor = Enum.IsDefined(settings.AccentColor) ? settings.AccentColor : defaults.AccentColor
+            AccentColor = Enum.IsDefined(settings.AccentColor) ? settings.AccentColor : defaults.AccentColor,
+            DiscordApplicationId = discordApplicationId,
+            // La présence ne peut pas être active sans identifiant d'application exploitable.
+            EnableDiscordPresence = settings.EnableDiscordPresence && discordApplicationId is not null
         };
     }
 }

@@ -1,20 +1,27 @@
 namespace LinkLauncher.App;
 
 using System.Windows;
+using System.Net.Http;
 using LinkLauncher.App.Services;
 using LinkLauncher.Core.Abstractions;
 using LinkLauncher.Core.Services;
 using LinkLauncher.Features.Dashboard;
+using LinkLauncher.Features.Discord;
 using LinkLauncher.Features.Library;
+using LinkLauncher.Features.Notifications;
 using LinkLauncher.Features.Navigation;
 using LinkLauncher.Features.Settings;
 using LinkLauncher.Features.Shell;
+using LinkLauncher.Features.Updates;
+using LinkLauncher.Infrastructure.Diagnostics;
+using LinkLauncher.Infrastructure.Discord;
 using LinkLauncher.Infrastructure.FileSystem;
 using LinkLauncher.Infrastructure.Library;
 using LinkLauncher.Infrastructure.Logging;
 using LinkLauncher.Infrastructure.Roblox;
 using LinkLauncher.Infrastructure.Settings;
 using LinkLauncher.Infrastructure.Windows;
+using LinkLauncher.Updater;
 using Microsoft.Extensions.DependencyInjection;
 
 /// <summary>Point de composition de l'application et gestion des erreurs globales.</summary>
@@ -46,6 +53,9 @@ public partial class App : Application
 
             var library = _serviceProvider.GetRequiredService<ILauncherLibrary>();
             await library.InitializeAsync();
+
+            _serviceProvider.GetRequiredService<RobloxActivityNotifier>().Start();
+            _serviceProvider.GetRequiredService<DiscordPresenceCoordinator>().Start();
 
             var themeService = _serviceProvider.GetRequiredService<IThemeService>();
             var systemThemeSource = _serviceProvider.GetRequiredService<ISystemThemeSource>();
@@ -111,6 +121,19 @@ public partial class App : Application
         services.AddSingleton<IRobloxIntegrityChecker, WindowsRobloxIntegrityChecker>();
         services.AddSingleton<IRobloxLaunchService, WindowsRobloxLaunchService>();
 
+        services.AddSingleton<INotificationPresenter, WpfNotificationPresenter>();
+        services.AddSingleton<IClipboardService, WpfClipboardService>();
+        services.AddSingleton<IDiscordIpcTransport, DiscordIpcClient>();
+        services.AddSingleton<IDiscordPresenceService, DiscordPresenceService>();
+        services.AddSingleton<IDiagnosticsProvider, WindowsDiagnosticsProvider>();
+        services.AddSingleton<RobloxActivityNotifier>();
+        services.AddSingleton<DiscordPresenceCoordinator>();
+
+        services.AddSingleton(provider => new HttpClient { Timeout = TimeSpan.FromSeconds(30) });
+        services.AddSingleton<IUpdateFeed, GitHubReleasesUpdateFeed>();
+        services.AddSingleton<IUpdateChecker, UpdateChecker>();
+        services.AddSingleton<IUpdateDownloader, UpdateDownloader>();
+
         services.AddSingleton<ILibraryStore, JsonLibraryStore>();
         services.AddSingleton<LauncherLibraryService>();
         services.AddSingleton<ILauncherLibrary>(provider => provider.GetRequiredService<LauncherLibraryService>());
@@ -119,6 +142,7 @@ public partial class App : Application
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<LibraryViewModel>();
         services.AddTransient<SettingsViewModel>();
+        services.AddTransient<UpdateViewModel>();
 
         services.AddSingleton<INavigationPageFactory, ServiceProviderPageFactory>();
         services.AddSingleton<INavigationService, NavigationService>();

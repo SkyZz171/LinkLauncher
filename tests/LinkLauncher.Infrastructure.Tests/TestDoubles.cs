@@ -1,3 +1,5 @@
+using LinkLauncher.Core.Services;
+
 namespace LinkLauncher.Infrastructure.Tests;
 
 using LinkLauncher.Core.Abstractions;
@@ -91,6 +93,86 @@ internal sealed class ThrowingSettingsStore : ISettingsStore
 
     public Task SaveAsync(AppSettings settings, CancellationToken cancellationToken = default) =>
         throw new IOException("Écriture impossible.");
+}
+
+internal sealed class StubSettingsService : ISettingsService
+{
+    public StubSettingsService(AppSettings? initial = null) =>
+        Current = AppSettingsNormalizer.Normalize(initial ?? AppSettings.CreateDefault());
+
+    public AppSettings Current { get; private set; }
+
+    public bool IsLoaded => true;
+
+    public event EventHandler<AppSettingsChangedEventArgs>? Changed;
+
+    public Task InitializeAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+    public Task<AppSettings> UpdateAsync(
+        Func<AppSettings, AppSettings> mutation,
+        CancellationToken cancellationToken = default)
+    {
+        var previous = Current;
+        Current = AppSettingsNormalizer.Normalize(mutation(previous));
+        Changed?.Invoke(this, new AppSettingsChangedEventArgs(previous, Current));
+
+        return Task.FromResult(Current);
+    }
+}
+
+internal sealed class StubVersionProvider : IApplicationVersionProvider
+{
+    public string Version { get; set; } = "0.0.0-test";
+}
+
+internal sealed class StubIntegrityChecker : IRobloxIntegrityChecker
+{
+    public RobloxIntegrityReport Report { get; set; } = new() { IsComplete = true };
+
+    public Task<RobloxIntegrityReport> CheckAsync(
+        RobloxInstallation installation,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult(Report);
+}
+
+internal sealed class FakeDiscordIpcTransport : IDiscordIpcTransport
+{
+    public bool IsConnected { get; private set; }
+
+    public bool ConnectResult { get; set; } = true;
+
+    public bool SendResult { get; set; } = true;
+
+    public List<string> ConnectedApplicationIds { get; } = [];
+
+    public List<string> SentPayloads { get; } = [];
+
+    public int DisconnectCount { get; private set; }
+
+    public Task<bool> ConnectAsync(string applicationId, CancellationToken cancellationToken = default)
+    {
+        ConnectedApplicationIds.Add(applicationId);
+        IsConnected = ConnectResult;
+
+        return Task.FromResult(ConnectResult);
+    }
+
+    public Task<bool> TrySendAsync(byte[] frame, CancellationToken cancellationToken = default)
+    {
+        SentPayloads.Add(System.Text.Encoding.UTF8.GetString(frame, 8, frame.Length - 8));
+
+        return Task.FromResult(SendResult);
+    }
+
+    public Task DisconnectAsync(CancellationToken cancellationToken = default)
+    {
+        DisconnectCount++;
+        IsConnected = false;
+
+        return Task.CompletedTask;
+    }
+
+    public void Dispose() => IsConnected = false;
 }
 
 internal sealed class FakeActiveProfileProvider : IActiveProfileProvider
