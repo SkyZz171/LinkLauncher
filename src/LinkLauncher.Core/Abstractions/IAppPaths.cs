@@ -12,6 +12,9 @@ public interface IAppPaths
     /// <summary>Chemin de la sauvegarde de la configuration.</summary>
     string SettingsBackupFilePath { get; }
 
+    /// <summary>Chemin du fichier de bibliothèque (profils et expériences).</summary>
+    string LibraryFilePath { get; }
+
     /// <summary>Répertoire de données local.</summary>
     string LocalDataDirectory { get; }
 

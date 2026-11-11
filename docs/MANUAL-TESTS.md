@@ -1,4 +1,4 @@
-# Tests manuels — Phases 1 et 2
+# Tests manuels — Phases 1 à 3
 
 Scénarios à valider sur une machine Windows. Cocher après exécution réelle.
 
@@ -60,10 +60,39 @@ Scénarios à valider sur une machine Windows. Cocher après exécution réelle.
 - [ ] Navigateur par défaut indisponible : « Installer ou réparer » affiche un message clair et
       journalise l'échec.
 
+## Bibliothèque et profils
+
+- [ ] Navigation : l'entrée « Bibliothèque » ouvre la page, la barre latérale la marque active.
+- [ ] Premier passage : un profil « Par défaut » existe et est actif ; la liste d'expériences est vide
+      et l'état vide explique qu'aucun téléchargement n'est effectué.
+- [ ] Ajout d'une expérience par lien officiel (`https://www.roblox.com/games/920587237/Adopt-Me`) :
+      elle apparaît avec son lieu et l'adresse canonique `https://www.roblox.com/games/920587237`.
+- [ ] Ajout par identifiant de lieu seul (`920587237`) : même résultat.
+- [ ] Ajout d'un lien étranger (`https://example.com/games/1`) ou d'un texte libre : refusé avec un message clair.
+- [ ] Ajout deux fois de la même expérience : refusé avec « Cette expérience est déjà dans la bibliothèque. ».
+- [ ] « Ouvrir sur Roblox » ouvre la page officielle dans le navigateur par défaut, puis la ligne
+      indique la date de dernière ouverture.
+- [ ] « Retirer » supprime l'expérience, et `%APPDATA%\LinkLauncher\library.json` ne la contient plus.
+- [ ] Ajout d'un profil (`Anglais`, `en-US`) : il apparaît dans la liste.
+- [ ] Sélection d'un profil : il devient actif, le résumé « Profil actif : … » et la ligne du
+      Dashboard « Profil de lancement : … » concordent.
+- [ ] Lancement après activation du profil « Anglais » : le journal contient
+      `robloxLocale:en_US+gameLocale:en_US` dans l'URI transmise.
+- [ ] Nom de profil vide ou déjà utilisé : refusé, aucun profil ajouté.
+- [ ] Langue invalide (`fr_FR+launchmode:play`) : refusée avec « La langue doit ressembler à fr_FR ou en-US. ».
+- [ ] Suppression d'un profil non actif : il disparaît, le profil actif reste inchangé.
+- [ ] Suppression du profil actif : le premier profil restant devient actif.
+- [ ] Tentative de suppression du dernier profil : refusée.
+- [ ] Redémarrage de LinkLauncher : profils, profil actif et expériences sont restaurés depuis `library.json`.
+
 ## Robustesse
 
 - [ ] `settings.json` corrompu à la main : l'application démarre, un fichier
       `settings.invalide-<horodatage>.json` est conservé, les valeurs par défaut s'appliquent.
+- [ ] `library.json` corrompu à la main : la page Bibliothèque s'ouvre avec un profil par défaut,
+      un fichier `library.invalide-<horodatage>.json` est conservé et l'incident est journalisé.
+- [ ] `library.json` contenant un lien étranger ou un doublon : l'entrée est écartée au chargement,
+      le reste de la bibliothèque est conservé.
 - [ ] Dossier `%APPDATA%\LinkLauncher` en lecture seule : message d'erreur compréhensible,
       l'application reste utilisable.
 - [ ] Fermeture pendant une vérification ou pendant un lancement : aucune exception non gérée.

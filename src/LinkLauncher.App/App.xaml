@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:LinkLauncher.App.Converters"
              xmlns:dashboard="clr-namespace:LinkLauncher.Features.Dashboard;assembly=LinkLauncher.Features"
+             xmlns:library="clr-namespace:LinkLauncher.Features.Library;assembly=LinkLauncher.Features"
              xmlns:settings="clr-namespace:LinkLauncher.Features.Settings;assembly=LinkLauncher.Features"
              xmlns:views="clr-namespace:LinkLauncher.App.Views"
              ShutdownMode="OnMainWindowClose">
@@ -15,6 +16,7 @@
                 <ResourceDictionary Source="Themes/Controls/Typography.xaml" />
                 <ResourceDictionary Source="Themes/Controls/Buttons.xaml" />
                 <ResourceDictionary Source="Themes/Controls/Cards.xaml" />
+                <ResourceDictionary Source="Themes/Controls/Inputs.xaml" />
                 <ResourceDictionary Source="Themes/Controls/Lists.xaml" />
                 <ResourceDictionary Source="Themes/Controls/ScrollBars.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -24,6 +26,10 @@
 
             <DataTemplate DataType="{x:Type dashboard:DashboardViewModel}">
                 <views:DashboardView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type library:LibraryViewModel}">
+                <views:LibraryView />
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type settings:SettingsViewModel}">

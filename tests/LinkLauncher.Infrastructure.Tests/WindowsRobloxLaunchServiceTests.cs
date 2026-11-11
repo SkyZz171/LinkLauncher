@@ -13,6 +13,7 @@ public sealed class WindowsRobloxLaunchServiceTests
     private readonly FakeProcessSource _processes = new();
     private readonly StubProtocolReader _protocol = new();
     private readonly FakeShellLauncher _shell = new();
+    private readonly FakeActiveProfileProvider _activeProfile = new();
 
     [Fact]
     public async Task LaunchClientAsync_WhenClientAlreadyRuns_DoesNotRequestLaunch()
@@ -66,6 +67,26 @@ public sealed class WindowsRobloxLaunchServiceTests
     }
 
     [Fact]
+    public async Task LaunchClientAsync_WithActiveProfileLocale_UsesProfileLanguage()
+    {
+        _probe.Installation = InstalledInstallation();
+        _protocol.Command = "\"C:\\Roblox\\RobloxPlayerBeta.exe\" %1";
+        _activeProfile.Profile = new LaunchProfile
+        {
+            Id = Guid.NewGuid(),
+            Name = "Anglais",
+            Locale = "en_US"
+        };
+
+        var result = await CreateService().LaunchClientAsync();
+
+        Assert.Equal(RobloxLaunchOutcome.Launched, result.Outcome);
+        var target = Assert.Single(_shell.Targets);
+        Assert.Contains("robloxLocale:en_US", target, StringComparison.Ordinal);
+        Assert.Contains("gameLocale:en_US", target, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task LaunchClientAsync_WhenShellFails_ReportsShellFailureWithDetail()
     {
         _probe.Installation = InstalledInstallation();
@@ -89,7 +110,7 @@ public sealed class WindowsRobloxLaunchServiceTests
     }
 
     private WindowsRobloxLaunchService CreateService() =>
-        new(_probe, _processes, _protocol, _shell, _logger);
+        new(_probe, _processes, _protocol, _shell, _activeProfile, _logger);
 
     private static RobloxInstallation InstalledInstallation() => new()
     {

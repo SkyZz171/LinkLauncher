@@ -296,6 +296,10 @@
                                Style="{StaticResource Text.Body.Secondary}"
                                Text="{Binding ProcessDetails}" />
 
+                    <TextBlock Margin="0,4,0,0"
+                               Style="{StaticResource Text.Caption}"
+                               Text="{Binding ActiveProfileText}" />
+
                     <TextBlock Margin="0,8,0,0"
                                Style="{StaticResource Text.Caption}"
                                Text="Le suivi se limite à la présence du processus et au code de sortie rapporté par Windows. Aucune mémoire, aucun module et aucun fil du client ne sont examinés ou modifiés." />

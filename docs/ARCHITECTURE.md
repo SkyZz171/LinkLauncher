@@ -24,18 +24,20 @@ Aucune dépendance technique. Contient :
 - **Modèles** : `AppSettings` (record immuable, versionné par `SchemaVersion`), `AppTheme`,
   `AccentColorKey`, `RobloxInstallation`, `RobloxInstallationState`, `RobloxBuildCandidate`,
   `RobloxIntegrityReport`, `RobloxProcessInfo`, `RobloxProcessTransition`, `RobloxLaunchResult`
-  (issue `RobloxLaunchOutcome`), `ShellLaunchResult`.
+  (issue `RobloxLaunchOutcome`), `ShellLaunchResult`, `LaunchProfile`, `Experience`,
+  `LauncherLibrary` (versionnée par `SchemaVersion`), `LibraryMutation`.
 - **Règles** : `ThemeResolver` (thème effectif), `RobloxVersionParser` (versions Windows
   `0, 747, 0, 7471481`), `RobloxBuildSelector` (dossier le plus récent), `AppSettingsNormalizer`
   (valeurs par défaut, schéma, énumérations inconnues), `RobloxLaunchUriBuilder` (URI officielle
   et locales validées), `RobloxIntegrityRules` (fichiers indispensables et recommandés),
   `RobloxProcessTracker` (comparaison de relevés → transitions), `RobloxWebUrls` (adresses
-  officielles).
+  officielles), `RobloxExperienceLink` (interprétation stricte des liens d'expériences),
+  `LauncherLibraryRules` (validation, normalisation et modifications de la bibliothèque).
 - **Abstractions** : `ISettingsService`, `ISettingsStore`, `IRobloxProbe`, `IThemeService`,
   `ISystemThemeSource`, `IProtocolRegistrationReader`, `IExecutableVersionReader`,
   `IFolderLauncher`, `IFileSystem`, `IAppPaths`, `IAppLogger`, `IApplicationVersionProvider`,
   `IShellLauncher`, `IRobloxLaunchService`, `IRobloxIntegrityChecker`, `IRobloxProcessSource`,
-  `IRobloxProcessMonitor`.
+  `IRobloxProcessMonitor`, `ILibraryStore`, `ILauncherLibrary`, `IActiveProfileProvider`.
 
 ### Infrastructure
 
@@ -56,7 +58,13 @@ Implémentations techniques :
   enregistré ou une URL — et rapporte l'échec plutôt que de le masquer.
 - `WindowsRobloxLaunchService` : refuse de lancer si le client tourne déjà ou si l'installation
   est inutilisable, vérifie l'enregistrement du protocole `roblox-player`, puis remet l'URI
-  `roblox-player:1+launchmode:app` au shell. Produit une `RobloxLaunchResult` explicite.
+  `roblox-player:1+launchmode:app` au shell. La langue provient du profil actif fourni par
+  `IActiveProfileProvider`. Produit une `RobloxLaunchResult` explicite.
+- `JsonLibraryStore` : conserve profils et expériences dans `library.json`, écriture atomique,
+  fichier illisible conservé puis contenu normalisé ou recréé.
+- `LauncherLibraryService` : état courant de la bibliothèque, mutations appliquées par les règles
+  du domaine puis enregistrées, événement `Changed` après chaque écriture réussie ; implémente
+  aussi `IActiveProfileProvider` pour le service de lancement.
 - `WindowsRobloxProcessSource` : releve `RobloxPlayerBeta` et conserve les handles pour pouvoir
   rapporter un code de sortie après fermeture. Seuls identité, démarrage, chemin et code de
   sortie sont lus.
@@ -71,6 +79,9 @@ Implémentations techniques :
 - `NavigationService` : navigation par route, pages créées une seule fois et conservées
   (l'état des pages survit à la navigation), événement `Navigated`.
 - `ShellViewModel` : barre latérale, page courante, titre, mode compact selon la largeur.
+- `LibraryViewModel` : présente les profils de lancement et les expériences ; délègue toute
+  validation à `ILauncherLibrary` et n'ouvre que des pages officielles via `IShellLauncher`.
+  Les commandes d'article reçoivent l'élément affiché en paramètre, sans closure dans la vue.
 - `DashboardViewModel` : expose **uniquement** des données issues de `IRobloxProbe`,
   `IRobloxIntegrityChecker`, `IRobloxLaunchService` et `IRobloxProcessMonitor`. États
   chargement / succès / avertissement / erreur, intégrité de l'installation, commandes
@@ -89,8 +100,8 @@ Implémentations techniques :
   et redéfinit les pinceaux d'accentuation ; les styles utilisent `DynamicResource`, donc le
   changement est immédiat et cohérent sur toutes les pages.
 - **Design system** : `Themes/Tokens.xaml` (typographie, rayons, espacements, dimensions, glyphes),
-  `Themes/Controls/*` (boutons, cartes, listes, barres de défilement, typographie). Aucune valeur
-  visuelle arbitraire dans les vues.
+  `Themes/Controls/*` (boutons, cartes, champs de saisie, listes, barres de défilement,
+  typographie). Aucune valeur visuelle arbitraire dans les vues.
 - **Chrome** : `WindowChrome` sans caption système, barre de titre personnalisée, `WindowInterop`
   (coins arrondis Windows 11, bordure sombre DWM, ajustement à la zone de travail au maximiser).
 - **Erreurs** : gestionnaires globaux (`DispatcherUnhandledException`, `AppDomain.UnhandledException`,
@@ -102,7 +113,9 @@ Implémentations techniques :
 2. Construction du conteneur d'injection de dépendances (`ValidateOnBuild`).
 3. `ISettingsService.InitializeAsync()` : lecture JSON, normalisation, valeurs par défaut si besoin.
 4. Application du thème (`ThemeResolver` + `IThemeService`).
-5. Affichage de `MainWindow` puis `ShellViewModel.StartAsync()` → Dashboard : démarrage du
+5. `ILauncherLibrary.InitializeAsync()` : lecture de `library.json`, normalisation, profil actif disponible
+   pour le service de lancement.
+6. Affichage de `MainWindow` puis `ShellViewModel.StartAsync()` → Dashboard : démarrage du
    moniteur de processus, détection de l'installation, vérification de l'intégrité.
 
 ## Décisions techniques
@@ -129,12 +142,19 @@ Implémentations techniques :
 - **Lancement confirmé par observation** : le ViewModel n'annonce pas « Roblox est ouvert » parce
   que le shell a accepté la demande, mais après la détection réelle du processus ; sinon il
   indique que le démarrage est en cours et que la surveillance continue.
+- **Liens d'expériences stricts** : `RobloxExperienceLink` n'accepte que les hôtes officiels et
+  les chemins `/games/<identifiant>` ; la page est reconstruite sous forme canonique
+  `https://www.roblox.com/games/<identifiant>`. Une saisie ne peut donc pas détourner
+  l'ouverture vers un autre site, et l'ouverture passe par le navigateur de l'utilisateur.
+- **Profils sans identifiants** : un profil de lancement ne stocke qu'un nom et une langue,
+  utilisée pour les paramètres `robloxLocale`/`gameLocale` du lancement sans session. Aucune
+  donnée de session n'est jamais enregistrée dans `library.json`.
 - **Journal non verrouillé** : écriture ouverte/fermée par entrée, pour rester consultable.
 - **Thème « Système »** : résolu au démarrage ; le suivi en direct des changements Windows
   pourra être ajouté avec un abonnement aux paramètres système.
 
 ## Prochaines étapes
 
-Phase 3 : profils et gestion de la bibliothèque d'expériences, puis notifications et présence
-Discord. `IRobloxLaunchService` et `IRobloxProcessMonitor` sont prêts à être réutilisés pour
-encadrer un lancement depuis un profil, sans jamais manipuler d'identifiants Roblox.
+Phase 4 : notifications Windows et présence Discord, puis diagnostics et mises à jour. La
+bibliothèque fournit déjà le contexte nécessaire (profil actif, expérience choisie) sans jamais
+manipuler d'identifiants Roblox.

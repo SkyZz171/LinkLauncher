@@ -8,6 +8,7 @@ public sealed class WindowsAppPaths : IAppPaths
     private const string ProductFolderName = "LinkLauncher";
     private const string SettingsFileName = "settings.json";
     private const string SettingsBackupFileName = "settings.bak.json";
+    private const string LibraryFileName = "library.json";
 
     /// <summary>Crée les chemins par défaut, sous les répertoires de données de l'utilisateur.</summary>
     public WindowsAppPaths()
@@ -37,6 +38,9 @@ public sealed class WindowsAppPaths : IAppPaths
 
     /// <inheritdoc />
     public string SettingsBackupFilePath => Path.Combine(ApplicationDataDirectory, SettingsBackupFileName);
+
+    /// <inheritdoc />
+    public string LibraryFilePath => Path.Combine(ApplicationDataDirectory, LibraryFileName);
 
     /// <inheritdoc />
     public string LocalDataDirectory { get; }

@@ -23,6 +23,7 @@ public sealed class WindowsRobloxLaunchService : IRobloxLaunchService
     private readonly IRobloxProcessSource _processSource;
     private readonly IProtocolRegistrationReader _protocolReader;
     private readonly IShellLauncher _shellLauncher;
+    private readonly IActiveProfileProvider _activeProfileProvider;
     private readonly IAppLogger _logger;
 
     /// <summary>Crée le service de lancement.</summary>
@@ -31,12 +32,14 @@ public sealed class WindowsRobloxLaunchService : IRobloxLaunchService
         IRobloxProcessSource processSource,
         IProtocolRegistrationReader protocolReader,
         IShellLauncher shellLauncher,
+        IActiveProfileProvider activeProfileProvider,
         IAppLogger logger)
     {
         _probe = probe ?? throw new ArgumentNullException(nameof(probe));
         _processSource = processSource ?? throw new ArgumentNullException(nameof(processSource));
         _protocolReader = protocolReader ?? throw new ArgumentNullException(nameof(protocolReader));
         _shellLauncher = shellLauncher ?? throw new ArgumentNullException(nameof(shellLauncher));
+        _activeProfileProvider = activeProfileProvider ?? throw new ArgumentNullException(nameof(activeProfileProvider));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -65,7 +68,7 @@ public sealed class WindowsRobloxLaunchService : IRobloxLaunchService
                 @"Aucune association pour roblox-player dans HKCU\Software\Classes.");
         }
 
-        var launchUri = RobloxLaunchUriBuilder.BuildClientLaunchUri(CultureInfo.CurrentUICulture.Name);
+        var launchUri = RobloxLaunchUriBuilder.BuildClientLaunchUri(ResolveLaunchLocale());
         var shellResult = _shellLauncher.Launch(launchUri);
 
         if (!shellResult.Succeeded)
@@ -89,5 +92,14 @@ public sealed class WindowsRobloxLaunchService : IRobloxLaunchService
 
         _logger.Info(Category, "Page de téléchargement officielle ouverte dans le navigateur par défaut.");
         return RobloxLaunchResult.Success(RobloxLaunchOutcome.Launched);
+    }
+
+    private string? ResolveLaunchLocale()
+    {
+        var profile = _activeProfileProvider.GetActiveProfile();
+
+        return string.IsNullOrWhiteSpace(profile?.Locale)
+            ? CultureInfo.CurrentUICulture.Name
+            : profile.Locale;
     }
 }

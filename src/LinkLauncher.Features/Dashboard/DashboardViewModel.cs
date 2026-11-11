@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LinkLauncher.Core.Abstractions;
 using LinkLauncher.Core.Models;
+using LinkLauncher.Core.Services;
 using LinkLauncher.Features.Common;
 using LinkLauncher.Features.Navigation;
 
@@ -20,6 +21,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IAsyncPage
     private readonly IRobloxIntegrityChecker _integrityChecker;
     private readonly IRobloxLaunchService _launchService;
     private readonly IRobloxProcessMonitor _processMonitor;
+    private readonly ILauncherLibrary _launcherLibrary;
     private readonly IFolderLauncher _folderLauncher;
     private readonly INavigationService _navigation;
     private readonly IAppLogger _logger;
@@ -34,6 +36,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IAsyncPage
         IRobloxIntegrityChecker integrityChecker,
         IRobloxLaunchService launchService,
         IRobloxProcessMonitor processMonitor,
+        ILauncherLibrary launcherLibrary,
         IFolderLauncher folderLauncher,
         INavigationService navigation,
         IApplicationVersionProvider versionProvider,
@@ -43,6 +46,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IAsyncPage
         _integrityChecker = integrityChecker ?? throw new ArgumentNullException(nameof(integrityChecker));
         _launchService = launchService ?? throw new ArgumentNullException(nameof(launchService));
         _processMonitor = processMonitor ?? throw new ArgumentNullException(nameof(processMonitor));
+        _launcherLibrary = launcherLibrary ?? throw new ArgumentNullException(nameof(launcherLibrary));
         _folderLauncher = folderLauncher ?? throw new ArgumentNullException(nameof(folderLauncher));
         _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -50,8 +54,10 @@ public sealed partial class DashboardViewModel : ObservableObject, IAsyncPage
 
         LauncherVersion = versionProvider.Version;
         ProcessDetails = DescribeProcess(null);
+        ActiveProfileText = DescribeActiveProfile();
 
         _processMonitor.Changed += OnProcessChanged;
+        _launcherLibrary.Changed += OnLibraryChanged;
     }
 
     /// <summary>Indique qu'une vérification est en cours.</summary>
@@ -111,6 +117,10 @@ public sealed partial class DashboardViewModel : ObservableObject, IAsyncPage
     /// <summary>Détail du processus observé.</summary>
     [ObservableProperty]
     private string _processDetails = "Aucun processus Roblox détecté.";
+
+    /// <summary>Profil de lancement appliqué au client Roblox.</summary>
+    [ObservableProperty]
+    private string _activeProfileText = "Profil de lancement : aucun.";
 
     /// <summary>Indique que les fichiers indispensables au lancement sont présents.</summary>
     [ObservableProperty]
@@ -445,6 +455,21 @@ public sealed partial class DashboardViewModel : ObservableObject, IAsyncPage
         var details = $"PID {process.ProcessId.ToString(CultureInfo.InvariantCulture)}";
 
         return startedAt is null ? $"{details}." : $"{details} · démarré à {startedAt}.";
+    }
+
+    private void OnLibraryChanged(object? sender, EventArgs e) =>
+        PostToUi(() => ActiveProfileText = DescribeActiveProfile());
+
+    private string DescribeActiveProfile()
+    {
+        var profile = LauncherLibraryRules.ResolveActiveProfile(_launcherLibrary.Current);
+
+        return profile switch
+        {
+            null => "Profil de lancement : aucun.",
+            { Locale: null } => $"Profil de lancement : {profile.Name} · langue du système",
+            _ => $"Profil de lancement : {profile.Name} · langue {profile.Locale}"
+        };
     }
 
     private static string DescribeStop(RobloxProcessInfo process)

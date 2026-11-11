@@ -5,10 +5,12 @@ using LinkLauncher.App.Services;
 using LinkLauncher.Core.Abstractions;
 using LinkLauncher.Core.Services;
 using LinkLauncher.Features.Dashboard;
+using LinkLauncher.Features.Library;
 using LinkLauncher.Features.Navigation;
 using LinkLauncher.Features.Settings;
 using LinkLauncher.Features.Shell;
 using LinkLauncher.Infrastructure.FileSystem;
+using LinkLauncher.Infrastructure.Library;
 using LinkLauncher.Infrastructure.Logging;
 using LinkLauncher.Infrastructure.Roblox;
 using LinkLauncher.Infrastructure.Settings;
@@ -41,6 +43,9 @@ public partial class App : Application
 
             var settings = _serviceProvider.GetRequiredService<ISettingsService>();
             await settings.InitializeAsync();
+
+            var library = _serviceProvider.GetRequiredService<ILauncherLibrary>();
+            await library.InitializeAsync();
 
             var themeService = _serviceProvider.GetRequiredService<IThemeService>();
             var systemThemeSource = _serviceProvider.GetRequiredService<ISystemThemeSource>();
@@ -106,7 +111,13 @@ public partial class App : Application
         services.AddSingleton<IRobloxIntegrityChecker, WindowsRobloxIntegrityChecker>();
         services.AddSingleton<IRobloxLaunchService, WindowsRobloxLaunchService>();
 
+        services.AddSingleton<ILibraryStore, JsonLibraryStore>();
+        services.AddSingleton<LauncherLibraryService>();
+        services.AddSingleton<ILauncherLibrary>(provider => provider.GetRequiredService<LauncherLibraryService>());
+        services.AddSingleton<IActiveProfileProvider>(provider => provider.GetRequiredService<LauncherLibraryService>());
+
         services.AddTransient<DashboardViewModel>();
+        services.AddTransient<LibraryViewModel>();
         services.AddTransient<SettingsViewModel>();
 
         services.AddSingleton<INavigationPageFactory, ServiceProviderPageFactory>();

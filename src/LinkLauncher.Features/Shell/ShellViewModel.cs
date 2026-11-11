@@ -30,6 +30,7 @@ public sealed partial class ShellViewModel : ObservableObject
         Items =
         [
             new NavigationItem(NavigationRoutes.Dashboard, "Dashboard", "\uE80F"),
+            new NavigationItem(NavigationRoutes.Library, "Bibliothèque", "\uE8F1"),
             new NavigationItem(NavigationRoutes.Settings, "Paramètres", "\uE713")
         ];
 

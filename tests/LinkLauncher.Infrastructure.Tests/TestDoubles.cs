@@ -92,3 +92,21 @@ internal sealed class ThrowingSettingsStore : ISettingsStore
     public Task SaveAsync(AppSettings settings, CancellationToken cancellationToken = default) =>
         throw new IOException("Écriture impossible.");
 }
+
+internal sealed class FakeActiveProfileProvider : IActiveProfileProvider
+{
+    public LaunchProfile? Profile { get; set; }
+
+    public LaunchProfile? GetActiveProfile() => Profile;
+}
+
+internal sealed class ThrowingLibraryStore : ILibraryStore
+{
+    public string LibraryFilePath => "library.json";
+
+    public Task<LauncherLibrary> LoadAsync(CancellationToken cancellationToken = default) =>
+        throw new IOException("Lecture impossible.");
+
+    public Task SaveAsync(LauncherLibrary library, CancellationToken cancellationToken = default) =>
+        throw new IOException("Écriture impossible.");
+}

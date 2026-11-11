@@ -30,6 +30,17 @@ public static class RobloxLaunchUriBuilder
     /// <param name="locale">Locale à valider.</param>
     public static bool IsSafeLocale(string? locale) => NormalizeLocale(locale) is not null;
 
+    /// <summary>
+    /// Normalise une locale (<c>fr-FR</c> → <c>fr_FR</c>) si elle est exploitable.
+    /// </summary>
+    /// <param name="locale">Locale saisie.</param>
+    /// <param name="normalizedLocale">Locale normalisée, sinon <see langword="null"/>.</param>
+    public static bool TryNormalizeLocale(string? locale, out string? normalizedLocale)
+    {
+        normalizedLocale = NormalizeLocale(locale);
+        return normalizedLocale is not null;
+    }
+
     private static string? NormalizeLocale(string? locale)
     {
         if (string.IsNullOrWhiteSpace(locale))

@@ -6,7 +6,7 @@ LinkLauncher utilise **le client Roblox officiel** : il ne modifie aucun binaire
 ne lit aucun identifiant Roblox et ne contourne aucun mécanisme de sécurité ou d'anti-triche.
 Le projet n'est pas affilié à Roblox Corporation.
 
-## État actuel — Phase 2 (lancement officiel et suivi du client)
+## État actuel — Phase 3 (bibliothèque d'expériences et profils de lancement)
 
 Fonctionnalités réellement opérationnelles dans cette version :
 
@@ -25,8 +25,10 @@ Fonctionnalités réellement opérationnelles dans cette version :
 | Couleur d'accentuation (6 palettes), appliquée à chaud et persistée | Opérationnel |
 | Configuration JSON avec sauvegarde, valeurs par défaut et résistance à la corruption | Opérationnel |
 | Journalisation fichier quotidienne | Opérationnel |
+| Bibliothèque d'expériences : ajout par lien officiel ou identifiant de lieu, retrait, date de dernière ouverture | Opérationnel |
+| Profils de lancement : nom et langue transmise au client, profil actif appliqué à « Jouer » | Opérationnel |
 | Rejoindre une expérience depuis LinkLauncher | **Non implémenté** — le navigateur s'en charge |
-| Installation / réparation automatisée, profils, Discord RPC, mises à jour, installateur | Non implémenté — phases suivantes |
+| Installation / réparation automatisée, Discord RPC, notifications, mises à jour, installateur | Non implémenté — phases suivantes |
 
 ### Comment le lancement fonctionne
 
@@ -41,6 +43,19 @@ le navigateur, et le Dashboard le dit explicitement.
 Le suivi se limite à la présence du processus `RobloxPlayerBeta`, à son PID, à son heure de
 démarrage et au code de sortie rapporté par Windows. Aucune mémoire, aucun module et aucun fil
 du client ne sont examinés ou modifiés.
+
+### Bibliothèque et profils
+
+La page **Bibliothèque** conserve une liste d'expériences et un ensemble de profils de lancement.
+Une expérience n'est qu'un nom et l'adresse de sa page officielle : LinkLauncher accepte
+`https://www.roblox.com/games/<identifiant>/…` ou directement l'identifiant de lieu, refuse tout
+autre site, et ouvre la page dans votre navigateur — c'est Roblox qui gère la connexion et le
+lancement de la partie.
+
+Un profil de lancement ne contient qu'un nom et une langue (`fr_FR`, `en-US`…). Le profil actif
+est transmis au client comme paramètre `robloxLocale`/`gameLocale` lors du lancement sans session :
+aucun identifiant, aucun cookie et aucun jeton ne sont enregistrés, ni dans la bibliothèque ni
+ailleurs.
 
 ## Prérequis
 
@@ -66,7 +81,7 @@ src/
   LinkLauncher.Infrastructure/  JSON, fichiers, registre Windows, journalisation, Roblox
   LinkLauncher.Features/        ViewModels, navigation, logique de présentation
 tests/
-  LinkLauncher.Core.Tests/             Règles métier, normalisation, navigation, lancement, processus
+  LinkLauncher.Core.Tests/             Règles métier, normalisation, navigation, lancement, bibliothèque
   LinkLauncher.Infrastructure.Tests/   Persistance, journalisation, détection, lancement, intégrité
 ```
 
@@ -80,6 +95,8 @@ lorsqu'ils contiendront du code réel : aucun projet vide n'est conservé dans l
 | Configuration | `%APPDATA%\LinkLauncher\settings.json` |
 | Sauvegarde de la configuration | `%APPDATA%\LinkLauncher\settings.bak.json` |
 | Configuration illisible conservée | `%APPDATA%\LinkLauncher\settings.invalide-<horodatage>.json` |
+| Bibliothèque (profils et expériences) | `%APPDATA%\LinkLauncher\library.json` |
+| Bibliothèque illisible conservée | `%APPDATA%\LinkLauncher\library.invalide-<horodatage>.json` |
 | Journaux d'activité | `%LOCALAPPDATA%\LinkLauncher\logs\linklauncher-AAAAMMJJ.log` |
 
 Aucun cookie, jeton ou identifiant Roblox n'est lu ni stocké.
@@ -87,4 +104,4 @@ Aucun cookie, jeton ou identifiant Roblox n'est lu ni stocké.
 ## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md) — couches, dépendances, décisions techniques.
-- [Tests manuels](docs/MANUAL-TESTS.md) — scénarios de validation des phases 1 et 2.
+- [Tests manuels](docs/MANUAL-TESTS.md) — scénarios de validation des phases 1 à 3.
