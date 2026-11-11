@@ -15,6 +15,9 @@ public interface IFileSystem
     /// <summary>Énumère les sous-répertoires d'un chemin.</summary>
     IEnumerable<string> EnumerateDirectories(string path);
 
+    /// <summary>Énumère les fichiers d'un chemin.</summary>
+    IEnumerable<string> EnumerateFiles(string path);
+
     /// <summary>Lit un fichier texte.</summary>
     Task<string> ReadAllTextAsync(string path, CancellationToken cancellationToken = default);
 

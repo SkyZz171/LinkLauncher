@@ -18,6 +18,9 @@ public sealed class SystemFileSystem : IFileSystem
     public IEnumerable<string> EnumerateDirectories(string path) => Directory.EnumerateDirectories(path);
 
     /// <inheritdoc />
+    public IEnumerable<string> EnumerateFiles(string path) => Directory.EnumerateFiles(path);
+
+    /// <inheritdoc />
     public Task<string> ReadAllTextAsync(string path, CancellationToken cancellationToken = default)
         => File.ReadAllTextAsync(path, cancellationToken);
 

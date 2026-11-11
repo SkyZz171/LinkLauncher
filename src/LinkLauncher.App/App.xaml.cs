@@ -100,6 +100,12 @@ public partial class App : Application
             provider.GetRequiredService<IAppLogger>(),
             WindowsRobloxProbe.DefaultRobloxRootPath));
 
+        services.AddSingleton<IShellLauncher, WindowsShellLauncher>();
+        services.AddSingleton<IRobloxProcessSource, WindowsRobloxProcessSource>();
+        services.AddSingleton<IRobloxProcessMonitor, WindowsRobloxProcessMonitor>();
+        services.AddSingleton<IRobloxIntegrityChecker, WindowsRobloxIntegrityChecker>();
+        services.AddSingleton<IRobloxLaunchService, WindowsRobloxLaunchService>();
+
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<SettingsViewModel>();
 

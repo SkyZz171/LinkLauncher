@@ -1,6 +1,7 @@
 namespace LinkLauncher.Infrastructure.Tests;
 
 using LinkLauncher.Core.Abstractions;
+using LinkLauncher.Core.Models;
 
 internal sealed record LogRecord(AppLogLevel Level, string Category, string Message, Exception? Exception);
 
@@ -49,13 +50,45 @@ internal sealed class StubProtocolReader : IProtocolRegistrationReader
     public string? TryGetCommand(string protocolScheme) => Command;
 }
 
+internal sealed class StubRobloxProbe : IRobloxProbe
+{
+    public RobloxInstallation Installation { get; set; } = new();
+
+    public Task<RobloxInstallation> ProbeAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(Installation);
+}
+
+internal sealed class FakeShellLauncher : IShellLauncher
+{
+    public List<string> Targets { get; } = [];
+
+    public ShellLaunchResult Result { get; set; } = new(true);
+
+    public ShellLaunchResult Launch(string target)
+    {
+        Targets.Add(target);
+        return Result;
+    }
+}
+
+internal sealed class FakeProcessSource : IRobloxProcessSource
+{
+    public List<RobloxProcessInfo> Running { get; } = [];
+
+    public int? ExitCode { get; set; }
+
+    public IReadOnlyList<RobloxProcessInfo> GetRunningProcesses() => Running;
+
+    public int? TryGetExitCode(int processId) => ExitCode;
+}
+
 internal sealed class ThrowingSettingsStore : ISettingsStore
 {
     public string SettingsFilePath => "settings.json";
 
-    public Task<Core.Models.AppSettings> LoadAsync(CancellationToken cancellationToken = default) =>
+    public Task<AppSettings> LoadAsync(CancellationToken cancellationToken = default) =>
         throw new IOException("Lecture impossible.");
 
-    public Task SaveAsync(Core.Models.AppSettings settings, CancellationToken cancellationToken = default) =>
+    public Task SaveAsync(AppSettings settings, CancellationToken cancellationToken = default) =>
         throw new IOException("Écriture impossible.");
 }
