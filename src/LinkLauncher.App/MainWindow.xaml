@@ -23,6 +23,12 @@
                       UseAeroCaptionButtons="False" />
     </WindowChrome.WindowChrome>
 
+    <Window.InputBindings>
+        <KeyBinding Key="D1" Modifiers="Ctrl" Command="{Binding NavigateToRouteCommand}" CommandParameter="dashboard" />
+        <KeyBinding Key="D2" Modifiers="Ctrl" Command="{Binding NavigateToRouteCommand}" CommandParameter="library" />
+        <KeyBinding Key="D3" Modifiers="Ctrl" Command="{Binding NavigateToRouteCommand}" CommandParameter="settings" />
+    </Window.InputBindings>
+
     <Window.Resources>
         <Storyboard x:Key="PageTransition">
             <DoubleAnimation Storyboard.TargetProperty="Opacity"
@@ -61,28 +67,19 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <StackPanel Margin="18,0,0,0" Orientation="Horizontal" VerticalAlignment="Center">
-                <Border Width="22" Height="22" Background="{DynamicResource Brush.Accent}" CornerRadius="7">
-                    <TextBlock HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               FontFamily="{StaticResource Font.Icon}"
-                               FontSize="10"
-                               Foreground="{DynamicResource Brush.Text.OnAccent}"
-                               Text="&#xE768;" />
-                </Border>
-                <TextBlock Margin="10,0,0,0"
+            <Border Width="18"
+                    Height="18"
+                    Margin="16,0,0,0"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource Brush.Accent}"
+                    CornerRadius="6">
+                <TextBlock HorizontalAlignment="Center"
                            VerticalAlignment="Center"
-                           FontSize="12.5"
-                           FontWeight="SemiBold"
-                           Foreground="{DynamicResource Brush.Text.Secondary}"
-                           Text="LinkLauncher" />
-            </StackPanel>
-
-            <TextBlock Grid.Column="1"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       Style="{StaticResource Text.Caption}"
-                       Text="{Binding PageTitle}" />
+                           FontFamily="{StaticResource Font.Icon}"
+                           FontSize="9"
+                           Foreground="{DynamicResource Brush.Text.OnAccent}"
+                           Text="&#xE768;" />
+            </Border>
 
             <StackPanel Grid.Column="2" Orientation="Horizontal">
                 <Button AutomationProperties.Name="Réduire"
@@ -130,23 +127,100 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <ItemsControl Grid.Row="0" Margin="14,12,14,0" ItemsSource="{Binding Items}">
+                    <!-- Marque -->
+                    <Border Grid.Row="0"
+                            Margin="14,12,14,4"
+                            Padding="10,8"
+                            AutomationProperties.Name="LinkLauncher"
+                            Background="{DynamicResource Brush.Surface.Alt}"
+                            BorderBrush="{DynamicResource Brush.Stroke}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Radius.Control}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsCompact}" Value="True">
+                                        <Setter Property="Margin" Value="12,12,12,4" />
+                                        <Setter Property="Padding" Value="6" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border Width="26"
+                                    Height="26"
+                                    VerticalAlignment="Center"
+                                    Background="{DynamicResource Brush.Accent}"
+                                    CornerRadius="8">
+                                <TextBlock HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           FontFamily="{StaticResource Font.Icon}"
+                                           FontSize="11"
+                                           Foreground="{DynamicResource Brush.Text.OnAccent}"
+                                           Text="&#xE768;" />
+                            </Border>
+
+                            <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCompact}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="LinkLauncher" />
+                                <TextBlock Margin="0,1,0,0"
+                                           Style="{StaticResource Text.Caption}"
+                                           Text="Launcher Roblox" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Section navigation -->
+                    <TextBlock Grid.Row="1"
+                               Margin="22,10,14,8"
+                               FontSize="{StaticResource FontSize.Caption}"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource Brush.Text.Tertiary}"
+                               Text="NAVIGATION">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsCompact}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <ItemsControl Grid.Row="2" Margin="14,0,14,0" ItemsSource="{Binding Items}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Button AutomationProperties.AutomationId="{Binding Route}"
                                         AutomationProperties.Name="{Binding Label}"
                                         Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                         CommandParameter="{Binding}"
-                                        Style="{StaticResource Button.NavItem}" />
+                                        Style="{StaticResource Button.NavItem}"
+                                        ToolTip="{Binding Label}" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <StackPanel Grid.Row="2" Margin="20,0,20,18">
+                    <StackPanel Grid.Row="4" Margin="20,0,20,18">
                         <TextBlock Text="{Binding AppVersion, StringFormat='Version {0}'}">
                             <TextBlock.Style>
                                 <Style BasedOn="{StaticResource Text.Caption}" TargetType="TextBlock">

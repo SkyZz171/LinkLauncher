@@ -16,6 +16,7 @@
     <sys:Double x:Key="FontSize.Body">13</sys:Double>
     <sys:Double x:Key="FontSize.Caption">11.5</sys:Double>
     <sys:Double x:Key="FontSize.Icon">15</sys:Double>
+    <sys:Double x:Key="FontSize.CallToAction">14</sys:Double>
 
     <!-- Rayons -->
     <CornerRadius x:Key="Radius.Card">14</CornerRadius>
@@ -33,6 +34,7 @@
     <sys:Double x:Key="Size.SidebarCompact">76</sys:Double>
     <sys:Double x:Key="Size.TitleBar">44</sys:Double>
     <sys:Double x:Key="Size.WindowButton">46</sys:Double>
+    <sys:Double x:Key="Size.Control.Large">44</sys:Double>
     <sys:Double x:Key="Size.Window.MinWidth">840</sys:Double>
     <sys:Double x:Key="Size.Window.MinHeight">580</sys:Double>
 

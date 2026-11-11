@@ -49,6 +49,12 @@
         </Setter>
     </Style>
 
+    <Style x:Key="Button.Primary.Large" TargetType="Button" BasedOn="{StaticResource Button.Primary}">
+        <Setter Property="Height" Value="{StaticResource Size.Control.Large}" />
+        <Setter Property="FontSize" Value="{StaticResource FontSize.CallToAction}" />
+        <Setter Property="Padding" Value="20,0" />
+    </Style>
+
     <Style x:Key="Button.Secondary" TargetType="Button" BasedOn="{StaticResource Button.Base}">
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
         <Setter Property="Template">
@@ -219,6 +225,27 @@
                                        Foreground="{DynamicResource Brush.Text.Secondary}"
                                        VerticalAlignment="Center" />
                         </StackPanel>
+                        <TextBlock x:Name="Shortcut"
+                                   Margin="0,0,14,0"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Center"
+                                   FontFamily="{StaticResource Font.Primary}"
+                                   FontSize="{StaticResource FontSize.Caption}"
+                                   Foreground="{DynamicResource Brush.Text.Tertiary}"
+                                   Text="{Binding Shortcut}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Shortcut}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Shortcut}" Value="">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -235,6 +262,7 @@
                         </DataTrigger>
                         <DataTrigger Binding="{Binding DataContext.IsCompact, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="True">
                             <Setter TargetName="Caption" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="Shortcut" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Content" Property="Margin" Value="0" />
                             <Setter TargetName="Content" Property="HorizontalAlignment" Value="Center" />
                         </DataTrigger>

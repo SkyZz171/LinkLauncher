@@ -9,11 +9,13 @@ public sealed partial class NavigationItem : ObservableObject
     /// <param name="route">Route associée.</param>
     /// <param name="label">Libellé affiché.</param>
     /// <param name="glyph">Glyphe de la police d'icônes Segoe.</param>
-    public NavigationItem(string route, string label, string glyph)
+    /// <param name="shortcut">Raccourci clavier affiché, s'il existe.</param>
+    public NavigationItem(string route, string label, string glyph, string? shortcut = null)
     {
         Route = route;
         Label = label;
         Glyph = glyph;
+        Shortcut = shortcut;
     }
 
     /// <summary>Route associée.</summary>
@@ -24,6 +26,9 @@ public sealed partial class NavigationItem : ObservableObject
 
     /// <summary>Glyphe de la police d'icônes.</summary>
     public string Glyph { get; }
+
+    /// <summary>Raccourci clavier affiché à droite de l'entrée.</summary>
+    public string? Shortcut { get; }
 
     /// <summary>Indique si l'élément correspond à la page affichée.</summary>
     [ObservableProperty]

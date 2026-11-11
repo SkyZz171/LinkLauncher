@@ -20,7 +20,7 @@
                     <TextBlock Style="{StaticResource Text.PageTitle}" Text="Dashboard" />
                     <TextBlock Margin="0,4,0,0"
                                Style="{StaticResource Text.Body.Secondary}"
-                               Text="État du client Roblox officiel installé sur ce PC." />
+                               Text="Votre client Roblox officiel, en un coup d'œil." />
                 </StackPanel>
 
                 <Button Grid.Column="1"
@@ -53,7 +53,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- Carte principale -->
+            <!-- État principal et actions -->
             <Border Style="{StaticResource Card.Hero}">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -112,7 +112,7 @@
                                        Style="{StaticResource Text.Body.Secondary}"
                                        Text="{Binding StatusDescription}" />
 
-                            <TextBlock Margin="0,10,0,0"
+                            <TextBlock Margin="0,8,0,0"
                                        Style="{StaticResource Text.Caption}"
                                        Text="{Binding LastCheckedText}" />
                         </StackPanel>
@@ -129,15 +129,16 @@
                         <StackPanel Orientation="Horizontal">
                             <Button AutomationProperties.Name="Jouer"
                                     Command="{Binding PlayCommand}"
-                                    Style="{StaticResource Button.Primary}"
+                                    Style="{StaticResource Button.Primary.Large}"
                                     ToolTip="Lancer le client Roblox officiel">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock FontSize="12" Style="{StaticResource Text.Icon}" Text="&#xE768;" />
-                                    <TextBlock Margin="8,0,0,0" Text="Jouer" VerticalAlignment="Center" />
+                                    <TextBlock Margin="9,0,0,0" Text="Jouer" VerticalAlignment="Center" />
                                 </StackPanel>
                             </Button>
 
                             <Button Margin="10,0,0,0"
+                                    VerticalAlignment="Center"
                                     AutomationProperties.Name="Ouvrir le dossier Roblox"
                                     Command="{Binding OpenInstallationFolderCommand}"
                                     Style="{StaticResource Button.Secondary}">
@@ -148,6 +149,8 @@
                             </Button>
 
                             <Button Margin="6,0,0,0"
+                                    VerticalAlignment="Center"
+                                    AutomationProperties.Name="Paramètres"
                                     Command="{Binding OpenSettingsCommand}"
                                     Content="Paramètres"
                                     Style="{StaticResource Button.Subtle}" />
@@ -176,96 +179,6 @@
                                Foreground="{DynamicResource Brush.Text.Primary}"
                                Style="{StaticResource Text.Body.Secondary}"
                                Text="{Binding WarningMessage}" />
-                </StackPanel>
-            </Border>
-
-            <!-- Informations -->
-            <WrapPanel Margin="0,16,-12,0">
-                <Border MinWidth="228" Margin="{StaticResource Spacing.CardGap}" Style="{StaticResource Card}">
-                    <StackPanel>
-                        <TextBlock Style="{StaticResource Text.Caption}" Text="Version du client" />
-                        <TextBlock Margin="0,6,0,0" Style="{StaticResource Text.Value}" Text="{Binding RobloxVersion}" />
-                        <TextBlock Margin="0,6,0,0"
-                                   Style="{StaticResource Text.Caption}"
-                                   Text="Déclarée par RobloxPlayerBeta.exe" />
-                    </StackPanel>
-                </Border>
-
-                <Border MinWidth="228" Margin="{StaticResource Spacing.CardGap}" Style="{StaticResource Card}">
-                    <StackPanel>
-                        <TextBlock Style="{StaticResource Text.Caption}" Text="Dossier de version" />
-                        <TextBlock Margin="0,8,0,0"
-                                   FontSize="13"
-                                   Foreground="{DynamicResource Brush.Text.Primary}"
-                                   Style="{StaticResource Text.Mono}"
-                                   Text="{Binding VersionFolderName}" />
-                        <TextBlock Margin="0,6,0,0"
-                                   Style="{StaticResource Text.Caption}"
-                                   Text="Dossier lu dans %LOCALAPPDATA%\Roblox\Versions" />
-                    </StackPanel>
-                </Border>
-
-                <Border MinWidth="228" Margin="{StaticResource Spacing.CardGap}" Style="{StaticResource Card}">
-                    <StackPanel>
-                        <TextBlock Style="{StaticResource Text.Caption}" Text="LinkLauncher" />
-                        <TextBlock Margin="0,6,0,0" Style="{StaticResource Text.Value}" Text="{Binding LauncherVersion}" />
-                        <TextBlock Margin="0,6,0,0"
-                                   Style="{StaticResource Text.Caption}"
-                                   Text="Phase 2 — lancement officiel" />
-                    </StackPanel>
-                </Border>
-            </WrapPanel>
-
-            <!-- Installation -->
-            <Border Margin="0,4,0,0" Style="{StaticResource Card}">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Style="{StaticResource Text.Section}" Text="Installation" />
-                        <Border Margin="10,1,0,0"
-                                Padding="9,2"
-                                VerticalAlignment="Center"
-                                BorderThickness="1"
-                                CornerRadius="{StaticResource Radius.Pill}">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="Background" Value="{DynamicResource Brush.Success.Subtle}" />
-                                    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Success}" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsInstallationComplete}" Value="False">
-                                            <Setter Property="Background" Value="{DynamicResource Brush.Warning.Subtle}" />
-                                            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Warning}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                            <TextBlock Style="{StaticResource Text.Caption}"
-                                       Foreground="{DynamicResource Brush.Text.Primary}"
-                                       Text="{Binding IntegrityBadgeText}" />
-                        </Border>
-                    </StackPanel>
-
-                    <Border Margin="0,12,0,0" Style="{StaticResource Card.Inset}">
-                        <TextBlock Style="{StaticResource Text.Mono}" Text="{Binding InstallationPath}" />
-                    </Border>
-
-                    <TextBlock Margin="0,10,0,0"
-                               Style="{StaticResource Text.Body.Secondary}"
-                               Text="{Binding IntegritySummary}" />
-
-                    <TextBlock Margin="0,4,0,0"
-                               Style="{StaticResource Text.Caption}"
-                               Text="{Binding RecommendedMissingText}"
-                               Visibility="{Binding RecommendedMissingText, Converter={StaticResource NullToVisibility}}" />
-
-                    <Button Margin="0,14,0,0"
-                            HorizontalAlignment="Left"
-                            Command="{Binding OpenDownloadPageCommand}"
-                            Content="Installer ou réparer (site officiel)"
-                            Style="{StaticResource Button.Secondary}" />
-
-                    <TextBlock Margin="0,8,0,0"
-                               Style="{StaticResource Text.Caption}"
-                               Text="Ouvre la page officielle roblox.com/download dans votre navigateur. LinkLauncher ne lance aucune installation silencieuse et ne modifie aucun fichier Roblox." />
                 </StackPanel>
             </Border>
 
@@ -306,27 +219,101 @@
                 </StackPanel>
             </Border>
 
-            <!-- Apparence -->
+            <!-- Installation -->
             <Border Margin="0,14,0,0" Style="{StaticResource Card}">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource Text.Section}" Text="Installation" />
+                        <Border Margin="10,1,0,0"
+                                Padding="9,2"
+                                VerticalAlignment="Center"
+                                BorderThickness="1"
+                                CornerRadius="{StaticResource Radius.Pill}">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="{DynamicResource Brush.Success.Subtle}" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Success}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsInstallationComplete}" Value="False">
+                                            <Setter Property="Background" Value="{DynamicResource Brush.Warning.Subtle}" />
+                                            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Warning}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock Style="{StaticResource Text.Caption}"
+                                       Foreground="{DynamicResource Brush.Text.Primary}"
+                                       Text="{Binding IntegrityBadgeText}" />
+                        </Border>
+                    </StackPanel>
+
+                    <Grid Margin="0,16,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Style="{StaticResource Text.Caption}" Text="Version du client" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource Text.Strong}" Text="{Binding RobloxVersion}" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,9,0,0" Style="{StaticResource Text.Caption}" Text="Dossier de version" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,9,0,0" Style="{StaticResource Text.Mono}" Text="{Binding VersionFolderName}" />
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,9,0,0" Style="{StaticResource Text.Caption}" Text="Emplacement" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,9,0,0" Style="{StaticResource Text.Mono}" Text="{Binding InstallationPath}" />
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,9,0,0" Style="{StaticResource Text.Caption}" Text="Fichiers indispensables" />
+                        <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,9,0,0">
+                            <TextBlock Style="{StaticResource Text.Body.Secondary}" Text="{Binding IntegritySummary}" />
+                            <TextBlock Margin="0,3,0,0"
+                                       Style="{StaticResource Text.Caption}"
+                                       Text="{Binding RecommendedMissingText}"
+                                       Visibility="{Binding RecommendedMissingText, Converter={StaticResource NullToVisibility}}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Style="{StaticResource Divider}" />
+
+                    <Button HorizontalAlignment="Left"
+                            AutomationProperties.Name="Installer ou réparer (site officiel)"
+                            Command="{Binding OpenDownloadPageCommand}"
+                            Content="Installer ou réparer (site officiel)"
+                            Style="{StaticResource Button.Secondary}" />
+
+                    <TextBlock Margin="0,8,0,0"
+                               Style="{StaticResource Text.Caption}"
+                               Text="Ouvre la page officielle roblox.com/download dans votre navigateur. LinkLauncher ne lance aucune installation silencieuse et ne modifie aucun fichier Roblox." />
+                </StackPanel>
+            </Border>
+
+            <!-- Apparence -->
+            <Border Margin="0,14,0,0" Style="{StaticResource Card.Inset}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel>
-                        <TextBlock Style="{StaticResource Text.Section}" Text="Apparence" />
-                        <TextBlock Margin="0,6,0,0"
-                                   Style="{StaticResource Text.Body.Secondary}"
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource Text.Strong}" Text="Apparence" />
+                        <TextBlock Margin="0,2,0,0"
+                                   Style="{StaticResource Text.Caption}"
                                    Text="Thème clair ou sombre et couleur d'accentuation, enregistrés automatiquement." />
                     </StackPanel>
 
                     <Button Grid.Column="1"
                             Margin="16,0,0,0"
                             VerticalAlignment="Center"
+                            AutomationProperties.Name="Ouvrir les paramètres"
                             Command="{Binding OpenSettingsCommand}"
                             Content="Ouvrir les paramètres"
-                            Style="{StaticResource Button.Secondary}" />
+                            Style="{StaticResource Button.Subtle}" />
                 </Grid>
             </Border>
 

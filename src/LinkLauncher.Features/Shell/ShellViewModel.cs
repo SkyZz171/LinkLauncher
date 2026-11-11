@@ -29,9 +29,9 @@ public sealed partial class ShellViewModel : ObservableObject
         AppVersion = versionProvider.Version;
         Items =
         [
-            new NavigationItem(NavigationRoutes.Dashboard, "Dashboard", "\uE80F"),
-            new NavigationItem(NavigationRoutes.Library, "Bibliothèque", "\uE8F1"),
-            new NavigationItem(NavigationRoutes.Settings, "Paramètres", "\uE713")
+            new NavigationItem(NavigationRoutes.Dashboard, "Dashboard", "\uE80F", "Ctrl+1"),
+            new NavigationItem(NavigationRoutes.Library, "Bibliothèque", "\uE8F1", "Ctrl+2"),
+            new NavigationItem(NavigationRoutes.Settings, "Paramètres", "\uE713", "Ctrl+3")
         ];
 
         _navigation.Navigated += OnNavigated;
@@ -76,6 +76,18 @@ public sealed partial class ShellViewModel : ObservableObject
         }
 
         Navigate(item.Route);
+        await InitializeCurrentPageAsync();
+    }
+
+    [RelayCommand]
+    private async Task NavigateToRouteAsync(string? route)
+    {
+        if (string.IsNullOrWhiteSpace(route))
+        {
+            return;
+        }
+
+        Navigate(route);
         await InitializeCurrentPageAsync();
     }
 
