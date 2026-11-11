@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="src/LinkLauncher.Core/LinkLauncher.Core.csproj" />
+  <Project Path="src/LinkLauncher.Infrastructure/LinkLauncher.Infrastructure.csproj" />
+  <Project Path="src/LinkLauncher.Features/LinkLauncher.Features.csproj" />
+  <Project Path="src/LinkLauncher.App/LinkLauncher.App.csproj" />
+  <Project Path="tests/LinkLauncher.Core.Tests/LinkLauncher.Core.Tests.csproj" />
+  <Project Path="tests/LinkLauncher.Infrastructure.Tests/LinkLauncher.Infrastructure.Tests.csproj" />
+</Solution>

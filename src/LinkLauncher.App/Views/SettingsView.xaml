@@ -1,0 +1,93 @@
+<UserControl x:Class="LinkLauncher.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Transparent"
+             Focusable="False">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  Focusable="False">
+        <StackPanel Margin="{StaticResource Padding.Page}" MaxWidth="920" HorizontalAlignment="Stretch">
+
+            <TextBlock Style="{StaticResource Text.PageTitle}" Text="Paramètres" />
+            <TextBlock Margin="0,4,0,20"
+                       Style="{StaticResource Text.Body.Secondary}"
+                       Text="Apparence et configuration persistante de LinkLauncher." />
+
+            <!-- Erreur -->
+            <Border Margin="0,0,0,14"
+                    Padding="14,10"
+                    Background="{DynamicResource Brush.Danger.Subtle}"
+                    BorderBrush="{DynamicResource Brush.Danger}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Radius.Control}"
+                    Visibility="{Binding ErrorMessage, Converter={StaticResource NullToVisibility}}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontSize="13" Foreground="{DynamicResource Brush.Danger}" Style="{StaticResource Text.Icon}" Text="&#xEA39;" />
+                    <TextBlock Margin="10,0,0,0"
+                               Foreground="{DynamicResource Brush.Text.Primary}"
+                               Style="{StaticResource Text.Body.Secondary}"
+                               Text="{Binding ErrorMessage}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Apparence -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="16" Foreground="{DynamicResource Brush.Accent}" Style="{StaticResource Text.Icon}" Text="&#xE790;" />
+                        <TextBlock Margin="10,0,0,0" Style="{StaticResource Text.Section}" Text="Apparence" />
+                    </StackPanel>
+
+                    <TextBlock Margin="0,18,0,0" Style="{StaticResource Text.Strong}" Text="Thème" />
+
+                    <ListBox Margin="0,8,0,0"
+                             ItemsSource="{Binding ThemeOptions}"
+                             SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
+                             Style="{StaticResource OptionList}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource Text.Strong}" Text="{Binding Label}" />
+                                    <TextBlock Margin="0,2,0,0" Style="{StaticResource Text.Caption}" Text="{Binding Description}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <TextBlock Margin="0,14,0,0" Style="{StaticResource Text.Strong}" Text="Couleur d'accentuation" />
+
+                    <ListBox Margin="0,10,0,0"
+                             ItemsSource="{Binding AccentOptions}"
+                             SelectedItem="{Binding SelectedAccent, Mode=TwoWay}"
+                             Style="{StaticResource SwatchList}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Configuration -->
+            <Border Margin="0,14,0,0" Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Text.Section}" Text="Configuration" />
+                    <TextBlock Margin="0,6,0,0"
+                               Style="{StaticResource Text.Body.Secondary}"
+                               Text="Les préférences sont écrites dans un fichier JSON, avec conservation de la version précédente." />
+
+                    <Border Margin="0,12,0,0" Style="{StaticResource Card.Inset}">
+                        <TextBlock Style="{StaticResource Text.Mono}" Text="{Binding SettingsFilePath}" />
+                    </Border>
+
+                    <TextBlock Margin="0,10,0,0" Style="{StaticResource Text.Caption}">
+                        <Run Text="LinkLauncher " />
+                        <Run Text="{Binding AppVersion, Mode=OneWay}" />
+                        <Run Text=" — phase 1" />
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <TextBlock Margin="0,16,0,0"
+                       Style="{StaticResource Text.Caption}"
+                       Text="La langue, le démarrage avec Windows et les notifications ne sont pas encore configurables : ils seront ajoutés dans une prochaine phase." />
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>

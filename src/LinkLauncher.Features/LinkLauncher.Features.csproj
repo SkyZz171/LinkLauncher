@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>LinkLauncher.Features</RootNamespace>
+    <Description>ViewModels et logique de présentation de LinkLauncher.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LinkLauncher.Core\LinkLauncher.Core.csproj" />
+  </ItemGroup>
+
+</Project>

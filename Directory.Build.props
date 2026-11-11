@@ -1,0 +1,22 @@
+<Project>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NeutralLanguage>fr-FR</NeutralLanguage>
+    <Company>LinkLauncher</Company>
+    <Product>LinkLauncher</Product>
+    <Authors>LinkLauncher</Authors>
+    <Version>0.1.0</Version>
+    <FileVersion>0.1.0.0</FileVersion>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <Copyright>Copyright © 2026 LinkLauncher</Copyright>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,189 @@
+<Window x:Class="LinkLauncher.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="LinkLauncher"
+        Width="1200"
+        Height="780"
+        MinWidth="{StaticResource Size.Window.MinWidth}"
+        MinHeight="{StaticResource Size.Window.MinHeight}"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        Background="{DynamicResource Brush.Canvas}"
+        Foreground="{DynamicResource Brush.Text.Primary}"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True"
+        TextOptions.TextFormattingMode="Display"
+        FontFamily="{StaticResource Font.Primary}">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0"
+                      ResizeBorderThickness="6"
+                      GlassFrameThickness="0"
+                      CornerRadius="0"
+                      UseAeroCaptionButtons="False" />
+    </WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <Storyboard x:Key="PageTransition">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                             From="0"
+                             To="1"
+                             Duration="0:0:0.18">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                             From="8"
+                             To="0"
+                             Duration="0:0:0.22">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Barre de titre -->
+        <Grid Grid.Row="0"
+              Height="{StaticResource Size.TitleBar}"
+              Background="Transparent"
+              MouseLeftButtonDown="OnTitleBarMouseLeftButtonDown">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Margin="18,0,0,0" Orientation="Horizontal" VerticalAlignment="Center">
+                <Border Width="22" Height="22" Background="{DynamicResource Brush.Accent}" CornerRadius="7">
+                    <TextBlock HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontFamily="{StaticResource Font.Icon}"
+                               FontSize="10"
+                               Foreground="{DynamicResource Brush.Text.OnAccent}"
+                               Text="&#xE768;" />
+                </Border>
+                <TextBlock Margin="10,0,0,0"
+                           VerticalAlignment="Center"
+                           FontSize="12.5"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                           Text="LinkLauncher" />
+            </StackPanel>
+
+            <TextBlock Grid.Column="1"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource Text.Caption}"
+                       Text="{Binding PageTitle}" />
+
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <Button AutomationProperties.Name="Réduire"
+                        Click="OnMinimizeClick"
+                        Content="&#xE921;"
+                        Style="{StaticResource Button.Window}"
+                        ToolTip="Réduire la fenêtre" />
+                <Button x:Name="MaximizeRestoreButton"
+                        AutomationProperties.Name="Agrandir"
+                        Click="OnMaximizeRestoreClick"
+                        Content="&#xE922;"
+                        Style="{StaticResource Button.Window}"
+                        ToolTip="Agrandir la fenêtre" />
+                <Button AutomationProperties.Name="Fermer"
+                        Click="OnCloseClick"
+                        Content="&#xE8BB;"
+                        Style="{StaticResource Button.Window.Close}"
+                        ToolTip="Fermer LinkLauncher" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Corps -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Barre latérale -->
+            <Border Grid.Column="0"
+                    Background="{DynamicResource Brush.Sidebar}"
+                    BorderBrush="{DynamicResource Brush.Stroke}"
+                    BorderThickness="0,0,1,0">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Width" Value="{StaticResource Size.Sidebar}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsCompact}" Value="True">
+                                <Setter Property="Width" Value="{StaticResource Size.SidebarCompact}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <ItemsControl Grid.Row="0" Margin="14,12,14,0" ItemsSource="{Binding Items}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button AutomationProperties.AutomationId="{Binding Route}"
+                                        AutomationProperties.Name="{Binding Label}"
+                                        Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource Button.NavItem}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <StackPanel Grid.Row="2" Margin="20,0,20,18">
+                        <TextBlock Text="{Binding AppVersion, StringFormat='Version {0}'}">
+                            <TextBlock.Style>
+                                <Style BasedOn="{StaticResource Text.Caption}" TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsCompact}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <TextBlock Margin="0,3,0,0" Text="Projet indépendant, non affilié à Roblox Corporation.">
+                            <TextBlock.Style>
+                                <Style BasedOn="{StaticResource Text.Caption}" TargetType="TextBlock">
+                                    <Setter Property="Opacity" Value="0.75" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsCompact}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Contenu -->
+            <ContentControl x:Name="PageHost"
+                            Grid.Column="1"
+                            Content="{Binding CurrentPage}"
+                            Focusable="False">
+                <ContentControl.RenderTransform>
+                    <TranslateTransform Y="0" />
+                </ContentControl.RenderTransform>
+            </ContentControl>
+        </Grid>
+    </Grid>
+
+</Window>
