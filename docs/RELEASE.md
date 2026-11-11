@@ -12,7 +12,9 @@ remplit **toutes** les conditions suivantes :
 3. elle contient un fichier joint dont le nom se termine par `.exe` (l'installeur) ;
 4. ses notes contiennent une empreinte **SHA-256** de 64 caractères hexadécimaux, par exemple
    `SHA-256 : 73ce01c0…` ;
-5. sa version est **supérieure** à la version installée.
+5. sa version est **supérieure** à la version installée ;
+6. le **dépôt est public** : l'API est interrogée sans jeton, donc un dépôt privé renvoie 404 et
+   la carte reste sur « Impossible de joindre le dépôt des publications ».
 
 Sans empreinte, la publication est listée mais le bouton « Télécharger » reste inactif : le
 téléchargeur refuse par principe tout paquet non vérifiable.
@@ -116,7 +118,7 @@ la carte Mises à jour.
 | --- | --- |
 | « LinkLauncher x.y.z est à jour. » alors qu'une release existe | version du tag non supérieure, release en brouillon, ou uniquement des fichiers `.zip` |
 | « Cette publication ne fournit pas d'empreinte SHA-256 » | notes sans empreinte de 64 caractères hexadécimaux |
-| « Impossible de joindre le dépôt des publications » | pas de réseau, ou quota GitHub épuisé (60 requêtes par heure et par adresse IP, sans authentification) |
+| « Impossible de joindre le dépôt des publications » | pas de réseau, dépôt **privé** (réponse 404 à une requête anonyme), ou quota GitHub épuisé (60 requêtes par heure et par adresse IP, sans authentification) |
 | « L'empreinte du paquet ne correspond pas » | fichier joint remplacé après calcul, empreinte erronée, ou notes mises à jour sans reconstruire le paquet |
 | Le téléchargement fonctionne mais l'installation échoue | paquet corrompu côté GitHub, ou droits insuffisants pour le dossier choisi |
 
@@ -124,6 +126,9 @@ la carte Mises à jour.
 
 - L'installeur n'est pas signé Authenticode : SmartScreen avertit au premier lancement, et la
   confiance repose uniquement sur l'empreinte publiée.
+- Tant que le dépôt reste **privé**, aucune release n'est lisible par la carte « Mises à jour » :
+  publier ne suffit pas, il faut aussi rendre le dépôt public (ou faire évoluer la fonctionnalité
+  pour accepter un jeton).
 - GitHub peut modifier un fichier joint (suppression puis réenvoi) : l'empreinte doit être
   recalculée à chaque remplacement, sinon les utilisateurs verront un refus de téléchargement.
 - La vérification ne protège pas contre une publication malveillante faite avec un accès au
